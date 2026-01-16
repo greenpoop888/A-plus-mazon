@@ -1,100 +1,127 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dropdown } from 'semantic-ui-react';
+import { getCategories } from '../services/api';
 
-const categories = {
-    primary: [
-        { key: 'electronics', text: 'Electronics', value: 'electronics' },
-        { key: 'clothing', text: 'Clothing', value: 'clothing' },
-        { key: 'books', text: 'Books', value: 'books' },
-    ],
-    secondary: {
-        electronics: [
-            { key: 'phones', text: 'Phones', value: 'phones' },
-            { key: 'laptops', text: 'Laptops', value: 'laptops' },
-            { key: 'accessories', text: 'Accessories', value: 'accessories' },
-        ],
-        clothing: [
-            { key: 'shirts', text: 'Shirts', value: 'shirts' },
-            { key: 'pants', text: 'Pants', value: 'pants' },
-            { key: 'shoes', text: 'Shoes', value: 'shoes' },
-        ],
-        books: [
-            { key: 'fiction', text: 'Fiction', value: 'fiction' },
-            { key: 'non-fiction', text: 'Non-Fiction', value: 'non-fiction' },
-            { key: 'textbooks', text: 'Textbooks', value: 'textbooks' },
-        ],
-    },
-    tertiary: {
-        phones: [
-            { key: 'android', text: 'Android', value: 'android' },
-            { key: 'ios', text: 'iOS', value: 'ios' },
-            { key: 'feature-phones', text: 'Feature Phones', value: 'feature-phones' },
-        ],
-        laptops: [
-            { key: 'gaming', text: 'Gaming', value: 'gaming' },
-            { key: 'business', text: 'Business', value: 'business' },
-            { key: 'ultrabook', text: 'Ultrabook', value: 'ultrabook' },
-        ],
-        accessories: [
-            { key: 'chargers', text: 'Chargers', value: 'chargers' },
-            { key: 'cases', text: 'Cases', value: 'cases' },
-            { key: 'headphones', text: 'Headphones', value: 'headphones' },
-        ],
-        shirts: [
-            { key: 't-shirts', text: 'T-Shirts', value: 't-shirts' },
-            { key: 'button-ups', text: 'Button-Ups', value: 'button-ups' },
-            { key: 'polos', text: 'Polos', value: 'polos' },
-        ],
-        pants: [
-            { key: 'jeans', text: 'Jeans', value: 'jeans' },
-            { key: 'khakis', text: 'Khakis', value: 'khakis' },
-            { key: 'shorts', text: 'Shorts', value: 'shorts' },
-        ],
-        shoes: [
-            { key: 'sneakers', text: 'Sneakers', value: 'sneakers' },
-            { key: 'boots', text: 'Boots', value: 'boots' },
-            { key: 'sandals', text: 'Sandals', value: 'sandals' },
-        ],
-        fiction: [
-            { key: 'mystery', text: 'Mystery', value: 'mystery' },
-            { key: 'romance', text: 'Romance', value: 'romance' },
-            { key: 'sci-fi', text: 'Sci-Fi', value: 'sci-fi' },
-        ],
-        'non-fiction': [
-            { key: 'biography', text: 'Biography', value: 'biography' },
-            { key: 'history', text: 'History', value: 'history' },
-            { key: 'self-help', text: 'Self-Help', value: 'self-help' },
-        ],
-        textbooks: [
-            { key: 'math', text: 'Math', value: 'math' },
-            { key: 'science', text: 'Science', value: 'science' },
-            { key: 'literature', text: 'Literature', value: 'literature' },
-        ],
-    },
-};
-
-const DropdownExampleSearchSelectionTwo = () => {
+const Categories = ({ onCategoryChange }) => {
+    const [categories, setCategories] = useState({
+        primary: [],
+        secondary: {},
+        tertiary: {}
+    });
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [selectedPrimary, setSelectedPrimary] = useState('');
     const [selectedSecondary, setSelectedSecondary] = useState('');
     const [selectedTertiary, setSelectedTertiary] = useState('');
 
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                setLoading(true);
+                const categoryData = await getCategories();
+
+                // Transform hierarchical data to flat structure for the component
+                const transformedCategories = {
+                    primary: [],
+                    secondary: {},
+                    tertiary: {}
+                };
+
+                categoryData.forEach(primaryCat => {
+                    // Add primary category
+                    transformedCategories.primary.push({
+                        key: primaryCat.id,
+                        text: primaryCat.name,
+                        value: primaryCat.id
+                    });
+
+                    // Process secondary categories
+                    if (primaryCat.subcategories) {
+                        primaryCat.subcategories.forEach(secondaryCat => {
+                            // Add secondary category under primary
+                            if (!transformedCategories.secondary[primaryCat.id]) {
+                                transformedCategories.secondary[primaryCat.id] = [];
+                            }
+                            transformedCategories.secondary[primaryCat.id].push({
+                                key: secondaryCat.id,
+                                text: secondaryCat.name,
+                                value: secondaryCat.id
+                            });
+
+                            // Process tertiary categories
+                            if (secondaryCat.subcategories) {
+                                secondaryCat.subcategories.forEach(tertiaryCat => {
+                                    // Add tertiary category under secondary
+                                    if (!transformedCategories.tertiary[secondaryCat.id]) {
+                                        transformedCategories.tertiary[secondaryCat.id] = [];
+                                    }
+                                    transformedCategories.tertiary[secondaryCat.id].push({
+                                        key: tertiaryCat.id,
+                                        text: tertiaryCat.name,
+                                        value: tertiaryCat.id
+                                    });
+                                });
+                            }
+                        });
+                    }
+                });
+
+                setCategories(transformedCategories);
+                setError(null);
+            } catch (err) {
+                console.error('Error fetching categories:', err);
+                setError('Failed to load categories');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCategories();
+    }, []);
+
     const handlePrimaryChange = (e, { value }) => {
+        const newCategories = {
+            primary: value,
+            secondary: '',
+            tertiary: ''
+        };
         setSelectedPrimary(value);
         setSelectedSecondary('');
         setSelectedTertiary('');
+        onCategoryChange && onCategoryChange(newCategories);
     };
 
     const handleSecondaryChange = (e, { value }) => {
+        const newCategories = {
+            primary: selectedPrimary,
+            secondary: value,
+            tertiary: ''
+        };
         setSelectedSecondary(value);
         setSelectedTertiary('');
+        onCategoryChange && onCategoryChange(newCategories);
     };
 
     const handleTertiaryChange = (e, { value }) => {
+        const newCategories = {
+            primary: selectedPrimary,
+            secondary: selectedSecondary,
+            tertiary: value
+        };
         setSelectedTertiary(value);
+        onCategoryChange && onCategoryChange(newCategories);
     };
 
     const secondaryOptions = selectedPrimary ? categories.secondary[selectedPrimary] || [] : [];
     const tertiaryOptions = selectedSecondary ? categories.tertiary[selectedSecondary] || [] : [];
+
+    if (loading) {
+        return <div>Loading categories...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
 
     return (
         <div>
@@ -131,4 +158,4 @@ const DropdownExampleSearchSelectionTwo = () => {
     );
 };
 
-export default DropdownExampleSearchSelectionTwo;
+export default Categories;

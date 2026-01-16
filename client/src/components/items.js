@@ -1,60 +1,57 @@
-import React from 'react';
-import { Card, Image, Button } from 'semantic-ui-react';
+import React, { useState, useEffect } from 'react';
+import { Card, Image, Button, Message } from 'semantic-ui-react';
+import { getProducts } from '../services/api';
 
-const products = [
-    {
-        id: 1,
-        name: 'Wireless Headphones',
-        description: 'High-quality wireless headphones with noise cancellation.',
-        price: '$99.99',
-        image: 'https://react.semantic-ui.com/images/avatar/large/matthew.png',
-    },
-    {
-        id: 2,
-        name: 'Smartphone Case',
-        description: 'Durable case for your smartphone with stylish design.',
-        price: '$19.99',
-        image: 'https://react.semantic-ui.com/images/avatar/large/matthew.png',
-    },
-    {
-        id: 3,
-        name: 'Laptop Stand',
-        description: 'Adjustable laptop stand for better ergonomics.',
-        price: '$49.99',
-        image: 'https://react.semantic-ui.com/images/avatar/large/matthew.png',
-    },
-    {
-        id: 4,
-        name: 'Bluetooth Speaker',
-        description: 'Portable Bluetooth speaker with excellent sound quality.',
-        price: '$79.99',
-        image: 'https://react.semantic-ui.com/images/avatar/large/matthew.png',
-    },
-    {
-        id: 5,
-        name: 'USB Charger',
-        description: 'Fast-charging USB charger compatible with multiple devices.',
-        price: '$14.99',
-        image: 'https://react.semantic-ui.com/images/avatar/large/matthew.png',
-    },
-    {
-        id: 6,
-        name: 'Gaming Mouse',
-        description: 'Ergonomic gaming mouse with customizable buttons.',
-        price: '$39.99',
-        image: 'https://react.semantic-ui.com/images/avatar/large/matthew.png',
-    },
-];
+const Items = ({ primaryCategory, secondaryCategory, tertiaryCategory }) => {
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-const Items = () => {
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                setLoading(true);
+                const filters = {};
+
+                if (primaryCategory) filters.primary_category = primaryCategory;
+                if (secondaryCategory) filters.secondary_category = secondaryCategory;
+                if (tertiaryCategory) filters.tertiary_category = tertiaryCategory;
+
+                const productData = await getProducts(filters);
+                setProducts(productData);
+                setError(null);
+            } catch (err) {
+                console.error('Error fetching products:', err);
+                setError('Failed to load products');
+                setProducts([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProducts();
+    }, [primaryCategory, secondaryCategory, tertiaryCategory]);
+
+    if (loading) {
+        return <Message info>Loading products...</Message>;
+    }
+
+    if (error) {
+        return <Message error>{error}</Message>;
+    }
+
+    if (products.length === 0) {
+        return <Message warning>No products found for the selected categories.</Message>;
+    }
+
     return (
         <Card.Group itemsPerRow={3} stackable>
             {products.map((product) => (
                 <Card key={product.id}>
-                    <Image src={product.image} wrapped ui={false} />
+                    <Image src={product.image_url} wrapped ui={false} />
                     <Card.Content>
                         <Card.Header>{product.name}</Card.Header>
-                        <Card.Meta>{product.price}</Card.Meta>
+                        <Card.Meta>${product.price}</Card.Meta>
                         <Card.Description>{product.description}</Card.Description>
                     </Card.Content>
                     <Card.Content extra>
