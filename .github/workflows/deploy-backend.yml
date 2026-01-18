@@ -13,11 +13,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup SSH
+      - name: Setup SSH to EC2
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy to EC2
@@ -26,35 +24,25 @@ jobs:
             set -e
 
             sudo yum install -y git python3.11 python3.11-devel python3.11-pip || true
-
             cd ~
 
             if [ ! -d "project" ]; then
-              echo "Project not found, cloning..."
-
-              mkdir -p ~/.ssh
-              ssh-keyscan -H github.com >> ~/.ssh/known_hosts
-              git clone git@github.com:seattle-university-cs-cloud-computing/homework-series-xinrou-xiao.git project
+              echo "Project not found, cloning via HTTPS..."
+              git clone https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/seattle-university-cs-cloud-computing/homework-series-xinrou-xiao.git project
+              
               cd ~/project/server
               python3.11 -m venv ~/project/server/venv
             fi
 
             cd ~/project/server
-
             git reset --hard origin/main
-            git pull
+            git pull https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/seattle-university-cs-cloud-computing/homework-series-xinrou-xiao.git main
 
             source ~/project/server/venv/bin/activate
-
-            pip install --upgrade pip
             pip install -r requirements.txt
 
             pkill -f "uvicorn main:app" || true
-
             nohup uvicorn main:app --host 0.0.0.0 --port 8000 > ~/uvicorn.log 2>&1 &
 
             echo "FastAPI restarted successfully"
           EOF
-
-
-
