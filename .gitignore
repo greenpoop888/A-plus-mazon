@@ -59,3 +59,8 @@ client/yarn-error.log*
 .terraform/
 *.tfstate*
 .terraform.lock.hcl
+
+# AWS credentials
+*.pem
+
+
