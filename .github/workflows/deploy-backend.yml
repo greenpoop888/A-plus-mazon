@@ -22,29 +22,39 @@ jobs:
 
       - name: Deploy to EC2
         run: |
-          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             set -e
 
             sudo yum install -y git python3.11 python3.11-devel python3.11-pip || true
+
             cd ~
 
             if [ ! -d "project" ]; then
               echo "Project not found, cloning..."
+
+              mkdir -p ~/.ssh
+              ssh-keyscan -H github.com >> ~/.ssh/known_hosts
               git clone git@github.com:seattle-university-cs-cloud-computing/homework-series-xinrou-xiao.git project
+              cd ~/project/server
               python3.11 -m venv ~/project/server/venv
             fi
 
             cd ~/project/server
+
             git reset --hard origin/main
             git pull
 
             source ~/project/server/venv/bin/activate
+
+            pip install --upgrade pip
             pip install -r requirements.txt
 
             pkill -f "uvicorn main:app" || true
+
             nohup uvicorn main:app --host 0.0.0.0 --port 8000 > ~/uvicorn.log 2>&1 &
 
             echo "FastAPI restarted successfully"
           EOF
+
 
 
