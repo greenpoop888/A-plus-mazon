@@ -30,8 +30,7 @@ jobs:
 
             if [ ! -d "project" ]; then
               echo "Project not found, cloning..."
-              git clone https://github.com/seattle-university-cs-cloud-computing/homework-series-xinrou-xiao.git project
-              cd ~/project/server
+              git clone git@github.com:seattle-university-cs-cloud-computing/homework-series-xinrou-xiao.git project
               python3.11 -m venv ~/project/server/venv
             fi
 
