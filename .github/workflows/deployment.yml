@@ -47,6 +47,7 @@ jobs:
             mkdir -p ~/duckdns
             DUCK_SCRIPT="~/duckdns/duck.sh"
             if [ ! -f "$DUCK_SCRIPT" ]; then
+              echo '#!/bin/bash
               echo 'echo url="https://www.duckdns.org/update?domains=${{ secrets.DUCKDNS_DOMAIN }}&token=${{ secrets.DUCKDNS_TOKEN }}&ip=" | curl -k -o ~/duckdns/duck.log -K -' > ~/duckdns/duck.sh
               chmod 700 ~/duckdns/duck.sh
             fi
