@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Dropdown } from 'semantic-ui-react';
+import { Dropdown, Button } from 'semantic-ui-react';
 import { getCategories } from '../services/api';
 
 const Categories = ({ onCategoryChange }) => {
@@ -112,6 +112,17 @@ const Categories = ({ onCategoryChange }) => {
         onCategoryChange && onCategoryChange(newCategories);
     };
 
+    const handleReset = () => {
+        setSelectedPrimary('');
+        setSelectedSecondary('');
+        setSelectedTertiary('');
+        onCategoryChange && onCategoryChange({
+            primary: '',
+            secondary: '',
+            tertiary: ''
+        });
+    };
+
     const secondaryOptions = selectedPrimary ? categories.secondary[selectedPrimary] || [] : [];
     const tertiaryOptions = selectedSecondary ? categories.tertiary[selectedSecondary] || [] : [];
 
@@ -154,6 +165,7 @@ const Categories = ({ onCategoryChange }) => {
                 disabled={!selectedSecondary}
                 style={{ marginRight: '10px' }}
             />
+            <Button onClick={handleReset} color='red'>Reset Filters</Button>
         </div>
     );
 };
