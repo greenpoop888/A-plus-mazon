@@ -30,8 +30,16 @@ jobs:
           cd client
           npm install
           npm run build
-          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -r build/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/react
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "sudo chown -R nginx:nginx /var/www/react"
+          
+          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -r build/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/frontend_build
+          
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            sudo mkdir -p /var/www/react
+            sudo rm -rf /var/www/react/*
+            sudo cp -r ~/frontend_build/* /var/www/react/
+            rm -rf ~/frontend_build
+            sudo chown -R nginx:nginx /var/www/react
+          EOF
 
       - name: Deploy to EC2
         run: |
