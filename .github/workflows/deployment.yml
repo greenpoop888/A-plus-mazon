@@ -18,7 +18,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.DUCKDNS_DOMAIN }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
       
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -30,8 +30,10 @@ jobs:
           cd client
           npm install
           npm run build
-          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -r build/ ${{ secrets.EC2_USER }}@${{ secrets.DUCKDNS_DOMAIN }}:~/frontend_build
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.DUCKDNS_DOMAIN }} << 'EOF'
+          
+          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -r build/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/frontend_build
+          
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             sudo mkdir -p /var/www/react
             sudo rm -rf /var/www/react/*
             sudo cp -r ~/frontend_build/* /var/www/react/
@@ -39,40 +41,44 @@ jobs:
             sudo chown -R nginx:nginx /var/www/react
           EOF
 
-      - name: Deploy Backend and Setup DuckDNS
+      - name: Deploy to EC2
         run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.DUCKDNS_DOMAIN }} << 'EOF'
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             set -e
-
-            mkdir -p /home/ec2-user/duckdns
-            DUCK_SCRIPT="/home/ec2-user/duckdns/duck.sh"
-
-            printf "#!/bin/bash\necho url=\"https://www.duckdns.org/update?domains=${{ secrets.DUCKDNS_DOMAIN }}&token=${{ secrets.DUCKDNS_TOKEN }}&ip=\" | curl -k -o /home/ec2-user/duckdns/duck.log -K -" > $DUCK_SCRIPT
-            
-            chmod 700 $DUCK_SCRIPT
-            $DUCK_SCRIPT
 
             if ! command -v git &> /dev/null; then
                 sudo yum install -y git
             fi
 
             if ! command -v python3.11 &> /dev/null; then
+                echo "Python 3.11 not found, installing..."
                 sudo yum update -y
                 sudo yum install -y python3.11 python3.11-devel python3.11-pip
+            else
+                echo "Python 3.11 already installed"
             fi
 
-            cd /home/ec2-user/project/server
+            cd ~/project/server
+
             if [ ! -d "venv" ]; then
                 python3.11 -m venv venv
             fi
+
             source venv/bin/activate
+
             pip install --upgrade pip
             pip install -r requirements.txt
+
+            pkill -f "uvicorn main:app" || true
+
+            nohup uvicorn main:app --host 0.0.0.0 --port 8000 > ~/uvicorn.log 2>&1 &
+
+            echo "FastAPI restarted successfully"
           EOF
           
       - name: Setup systemd service on EC2
         run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.DUCKDNS_DOMAIN }} << 'EOF'
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             SERVICE_CONTENT="[Unit]
             Description=My FastAPI + React Service
             After=network.target
@@ -80,7 +86,6 @@ jobs:
             [Service]
             User=ec2-user
             WorkingDirectory=/home/ec2-user/project/server
-            ExecStartPre=/home/ec2-user/duckdns/duck.sh
             ExecStart=/home/ec2-user/project/server/venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000
             Restart=always
 
@@ -89,8 +94,17 @@ jobs:
 
             SERVICE_FILE="/etc/systemd/system/myproject.service"
 
-            echo "$SERVICE_CONTENT" | sudo tee $SERVICE_FILE > /dev/null
-            sudo systemctl daemon-reload
-            sudo systemctl enable myproject.service
-            sudo systemctl restart myproject.service
+            if [ ! -f "$SERVICE_FILE" ]; then
+              echo "Creating systemd service file..."
+              
+              echo "$SERVICE_CONTENT" | sudo tee $SERVICE_FILE > /dev/null
+              
+              sudo systemctl daemon-reload
+              sudo systemctl enable myproject.service
+              sudo systemctl start myproject.service
+              echo "Service created and started."
+            else
+              echo "Service already exists. Restarting to apply code changes..."
+              sudo systemctl restart myproject.service
+            fi
           EOF
