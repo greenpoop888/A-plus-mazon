@@ -16,9 +16,9 @@ jobs:
       - name: Setup SSH to EC2
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.DUCKDNS_DOMAIN }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.DUCKDNS_DOMAIN }} >> ~/.ssh/known_hosts
       
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -30,8 +30,8 @@ jobs:
           cd client
           npm install
           npm run build
-          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -r build/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/frontend_build
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -r build/ ${{ secrets.EC2_USER }}@${{ secrets.DUCKDNS_DOMAIN }}:~/frontend_build
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.DUCKDNS_DOMAIN }} << 'EOF'
             sudo mkdir -p /var/www/react
             sudo rm -rf /var/www/react/*
             sudo cp -r ~/frontend_build/* /var/www/react/
@@ -41,7 +41,7 @@ jobs:
 
       - name: Deploy Backend and Setup DuckDNS
         run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.DUCKDNS_DOMAIN }} << 'EOF'
             set -e
 
             mkdir -p ~/duckdns
@@ -72,7 +72,7 @@ jobs:
           
       - name: Setup systemd service on EC2
         run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.DUCKDNS_DOMAIN }} << 'EOF'
             SERVICE_CONTENT="[Unit]
             Description=My FastAPI + React Service
             After=network.target
