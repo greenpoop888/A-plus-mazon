@@ -75,3 +75,34 @@ jobs:
 
             echo "FastAPI restarted successfully"
           EOF
+          
+      - name: Setup systemd service on EC2
+        run: |
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            SERVICE_FILE="/etc/systemd/system/myproject.service"
+            if [ ! -f "$SERVICE_FILE" ]; then
+              echo "Creating systemd service file..."
+              sudo tee $SERVICE_FILE > /dev/null << EOL
+              [Unit]
+              Description=My FastAPI + React Service
+              After=network.target
+
+              [Service]
+              User=ec2-user
+              WorkingDirectory=/home/ec2-user/project/server
+              ExecStart=/home/ec2-user/project/server/venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000
+              Restart=always
+
+              [Install]
+              WantedBy=multi-user.target
+              EOL
+
+              sudo systemctl daemon-reload
+              sudo systemctl enable myproject.service
+              sudo systemctl start myproject.service
+              echo "Service created and started."
+            else
+              echo "Service file already exists. Skipping creation."
+            fi
+          EOF
+
