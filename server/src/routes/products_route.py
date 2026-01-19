@@ -6,7 +6,7 @@ from ..controllers.product_controller import ProductController
 router = APIRouter()
 product_controller = ProductController()
 
-@router.get("/product", response_model=List[Product])
+@router.get("/api/product", response_model=List[Product])
 async def get_products(
     primary_category: Optional[str] = Query(None, description="Filter by primary category ID"),
     secondary_category: Optional[str] = Query(None, description="Filter by secondary category ID"),

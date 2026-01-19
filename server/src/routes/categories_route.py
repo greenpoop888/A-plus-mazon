@@ -5,7 +5,7 @@ from ..controllers.category_controller import CategoryController
 router = APIRouter()
 category_controller = CategoryController()
 
-@router.get("/categories", response_model=List[Dict[str, Any]])
+@router.get("/api/categories", response_model=List[Dict[str, Any]])
 async def get_categories():
     """
     Retrieve all categories in hierarchical structure.
