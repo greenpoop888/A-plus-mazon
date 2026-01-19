@@ -47,10 +47,8 @@ jobs:
             mkdir -p /home/ec2-user/duckdns
             DUCK_SCRIPT="/home/ec2-user/duckdns/duck.sh"
 
-            cat << 'INNER_EOF' > $DUCK_SCRIPT
-echo url="https://www.duckdns.org/update?domains=${{ secrets.DUCKDNS_DOMAIN }}&token=${{ secrets.DUCKDNS_TOKEN }}&ip=" | curl -k -o /home/ec2-user/duckdns/duck.log -K -
-INNER_EOF
-
+            printf "#!/bin/bash\necho url=\"https://www.duckdns.org/update?domains=${{ secrets.DUCKDNS_DOMAIN }}&token=${{ secrets.DUCKDNS_TOKEN }}&ip=\" | curl -k -o /home/ec2-user/duckdns/duck.log -K -" > $DUCK_SCRIPT
+            
             chmod 700 $DUCK_SCRIPT
             $DUCK_SCRIPT
 
