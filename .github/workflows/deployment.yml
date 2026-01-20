@@ -58,6 +58,10 @@ jobs:
                 echo "Python 3.11 already installed"
             fi
 
+            if [ ! -d "~/project" ]; then
+                git clone git@github.com:seattle-university-cs-cloud-computing/homework-series-xinrou-xiao.git ~/project
+            fi
+            
             cd ~/project/server
 
             if [ ! -d "venv" ]; then
