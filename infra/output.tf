@@ -22,3 +22,11 @@ output "s3_bucket_arn" {
   description = "ARN of the S3 bucket"
   value       = aws_s3_bucket.app_bucket.arn
 }
+
+output "s3_bucket_id" {
+  value = aws_s3_bucket.app_bucket.id
+}
+
+output "s3_bucket_domain_name" {
+  value = "https://${aws_s3_bucket.app_bucket.bucket_regional_domain_name}"
+}

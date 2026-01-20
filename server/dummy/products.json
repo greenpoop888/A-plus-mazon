@@ -5,7 +5,7 @@
         "name": "iPhone 15 Pro",
         "description": "Latest iPhone with advanced camera and performance",
         "price": 999.99,
-        "image_url": "s3://cloud-computing-project-product-images/products/electronics/gadgets/smartphones/iphone 15 pro.jpg",
+        "image_url": "https://cloud-computing-project-product-images.s3.us-east-1.amazonaws.com/products/electronics/gadgets/smartphones/iphone 15 pro.jpg",
         "ingredients": [
             "aluminum",
             "glass",
@@ -21,7 +21,7 @@
         "name": "Samsung Galaxy S24",
         "description": "Android flagship with AI features",
         "price": 899.99,
-        "image_url": "s3://cloud-computing-project-product-images/products/electronics/gadgets/smartphones/Samsung Galaxy S24.jpg",
+        "image_url": "https://cloud-computing-project-product-images.s3.us-east-1.amazonaws.com/products/electronics/gadgets/smartphones/Samsung Galaxy S24.jpg",
         "ingredients": [
             "plastic",
             "glass",
@@ -37,7 +37,7 @@
         "name": "iPad Air",
         "description": "Versatile tablet for work and entertainment",
         "price": 599.99,
-        "image_url": "s3://cloud-computing-project-product-images/products/electronics/gadgets/tablets/iPad Air.jpg",
+        "image_url": "https://cloud-computing-project-product-images.s3.us-east-1.amazonaws.com/products/electronics/gadgets/tablets/iPad Air.jpg",
         "ingredients": [
             "aluminum",
             "glass",
@@ -53,7 +53,7 @@
         "name": "MacBook Pro 16\"",
         "description": "Professional laptop with M3 chip",
         "price": 2499.99,
-        "image_url": "s3://cloud-computing-project-product-images/products/electronics/computers/MacBook Pro 16.jpg",
+        "image_url": "https://cloud-computing-project-product-images.s3.us-east-1.amazonaws.com/products/electronics/computers/MacBook Pro 16.jpg",
         "ingredients": [
             "aluminum",
             "glass",
@@ -69,7 +69,7 @@
         "name": "Dell XPS Desktop",
         "description": "High-performance desktop computer",
         "price": 1299.99,
-        "image_url": "s3://cloud-computing-project-product-images/products/electronics/computers/Dell XPS Desktop.jpg",
+        "image_url": "https://cloud-computing-project-product-images.s3.us-east-1.amazonaws.com/products/electronics/computers/Dell XPS Desktop.jpg",
         "ingredients": [
             "plastic",
             "metal",
@@ -85,7 +85,7 @@
         "name": "The Da Vinci Code",
         "description": "Thrilling mystery novel by Dan Brown",
         "price": 12.99,
-        "image_url": "s3://cloud-computing-project-product-images/products/books/fiction/mystery/The Da Vinci Code.jpg",
+        "image_url": "https://cloud-computing-project-product-images.s3.us-east-1.amazonaws.com/products/books/fiction/mystery/The Da Vinci Code.jpg",
         "ingredients": [
             "paper",
             "ink"
@@ -100,7 +100,7 @@
         "name": "Pride and Prejudice",
         "description": "Classic romance novel by Jane Austen",
         "price": 9.99,
-        "image_url": "s3://cloud-computing-project-product-images/products/books/fiction/romance/Pride and Prejudice.jpg",
+        "image_url": "https://cloud-computing-project-product-images.s3.us-east-1.amazonaws.com/products/books/fiction/romance/Pride and Prejudice.jpg",
         "ingredients": [
             "paper",
             "ink"
@@ -115,7 +115,7 @@
         "name": "Sapiens: A Brief History of Humankind",
         "description": "Non-fiction book about human history",
         "price": 18.99,
-        "image_url": "s3://cloud-computing-project-product-images/products/books/non-fiction/Sapiens.jpg",
+        "image_url": "https://cloud-computing-project-product-images.s3.us-east-1.amazonaws.com/products/books/non-fiction/Sapiens A Brief History of Humankind.jpg",
         "ingredients": [
             "paper",
             "ink"
@@ -130,7 +130,7 @@
         "name": "Cotton T-Shirt",
         "description": "Comfortable basic t-shirt",
         "price": 15.99,
-        "image_url": "s3://cloud-computing-project-product-images/products/clothing/mens/shirts/Cotton T-Shirt.jpg",
+        "image_url": "https://cloud-computing-project-product-images.s3.us-east-1.amazonaws.com/products/clothing/mens/shirts/Cotton T-Shirt.jpg",
         "ingredients": [
             "cotton",
             "thread"
@@ -145,7 +145,7 @@
         "name": "Jeans",
         "description": "Classic denim pants",
         "price": 49.99,
-        "image_url": "s3://cloud-computing-project-product-images/products/clothing/mens/pants/Jeans.jpg",
+        "image_url": "https://cloud-computing-project-product-images.s3.us-east-1.amazonaws.com/products/clothing/mens/pants/Jeans.jpg",
         "ingredients": [
             "denim",
             "thread",
