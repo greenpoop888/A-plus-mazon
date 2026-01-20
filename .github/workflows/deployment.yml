@@ -61,7 +61,7 @@ jobs:
             PROJECT_ROOT="/home/ec2-user/project"
             mkdir -p "$PROJECT_ROOT"
 
-            if [ ! -d "$PROJECT_ROOT"/.git" ]; then
+            if [ ! -d "$PROJECT_ROOT/.git" ]; then
                 echo "Directory doesn't exist or is not a git repo, cloning..."
                 mkdir -p ~/project
                 cd ~/project
