@@ -38,7 +38,6 @@ const Items = ({ primaryCategory, secondaryCategory, tertiaryCategory }) => {
         <Card.Group itemsPerRow={3} stackable>
             {products.map((product) => (
                 <Card key={product.id} style={{
-                    width: '300px',
                     height: '450px',
                     display: 'flex',
                     flexDirection: 'column'

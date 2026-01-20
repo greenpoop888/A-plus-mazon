@@ -30,3 +30,8 @@ output "s3_bucket_id" {
 output "s3_bucket_domain_name" {
   value = "https://${aws_s3_bucket.app_bucket.bucket_regional_domain_name}"
 }
+
+output "eip_ip" {
+  description = "The public Elastic IP address assigned to the EC2 instance"
+  value       = aws_eip.app_eip.public_ip
+}

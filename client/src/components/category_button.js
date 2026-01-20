@@ -165,7 +165,7 @@ const Categories = ({ onCategoryChange }) => {
                 disabled={!selectedSecondary}
                 style={{ marginRight: '10px' }}
             />
-            <Button onClick={handleReset} color='orange'>Reset Filters</Button>
+            <Button onClick={handleReset} color='orange'>Reset</Button>
         </div>
     );
 };
