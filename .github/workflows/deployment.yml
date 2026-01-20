@@ -58,19 +58,22 @@ jobs:
                 echo "Python 3.11 already installed"
             fi
 
-            if [ ! -d "~/project" ]; then
+            PROJECT_ROOT="/home/ec2-user/project"
+            mkdir -p "$PROJECT_ROOT"
+
+            if [ ! -d "$PROJECT_ROOT"/.git" ]; then
                 echo "Directory doesn't exist or is not a git repo, cloning..."
                 mkdir -p ~/project
                 cd ~/project
-                git clone git@github.com:seattle-university-cs-cloud-computing/homework-series-xinrou-xiao.git .
+                git clone git@github.com:seattle-university-cs-cloud-computing/homework-series-xinrou-xiao.git "$PROJECT_ROOT"
             else
                 echo "Project directory exists, pulling latest changes..."
-                cd ~/project
+                cd "$PROJECT_ROOT"
                 git fetch --all
                 git reset --hard origin/main
             fi
 
-            cd ~/project/server
+            cd "$PROJECT_ROOT/server"
 
             if [ ! -d "venv" ]; then
                 python3.11 -m venv venv
