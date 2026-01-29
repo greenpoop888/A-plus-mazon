@@ -23,3 +23,11 @@ The service will be available at `http://localhost:8000`
 
 Once the service is running, visit:
 - Swagger UI: `http://localhost:8000/docs`
+
+## Seed data set up
+```bash
+cd server
+cd src
+python -m seeds.database
+python -m seeds.dummy_data
+```

@@ -2,11 +2,7 @@ import sys
 import os
 from dotenv import load_dotenv
 from sqlmodel import create_engine, SQLModel
-from models.category import Category
-from models.product import Product
-from models.store import Store
-from models.product_in_store import ProductInStore
-from models.product_line import ProductLine
+from models import Product, Category, Store, ProductLine, ProductInStore
 
 load_dotenv()
 

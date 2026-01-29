@@ -1,50 +1,78 @@
 [
-    {
-        "barcode": "4902102072618",
-        "name": "Coca-Cola Classic",
-        "description": "Refreshing carbonated soft drink.",
-        "price": 1.25,
-        "image_url": "https://example.com/cola.jpg",
-        "ingredients": [
-            "Carbonated Water",
-            "Sugar",
-            "Caramel Color",
-            "Phosphoric Acid"
-        ],
-        "primary_category_id": "beverages",
-        "on_sale": true,
-        "sale_rate": 0.9
-    },
-    {
-        "barcode": "074108000433",
-        "name": "Pringles Sour Cream & Onion",
-        "description": "Savory potato crisps with sour cream flavor.",
-        "price": 2.50,
-        "image_url": "https://example.com/pringles.jpg",
-        "ingredients": [
-            "Dried Potatoes",
-            "Vegetable Oil",
-            "Rice Flour",
-            "Wheat Starch"
-        ],
-        "primary_category_id": "snacks",
-        "secondary_category_id": "chips",
-        "on_sale": false,
-        "sale_rate": null
-    },
-    {
-        "barcode": "8850157400100",
-        "name": "Thai Jasmine Rice",
-        "description": "Premium long-grain fragrant rice.",
-        "price": 15.99,
-        "image_url": "https://example.com/rice.jpg",
-        "ingredients": [
-            "Jasmine Rice 100%"
-        ],
-        "primary_category_id": "pantry",
-        "secondary_category_id": "grains",
-        "tertiary_category_id": "rice",
-        "on_sale": false,
-        "sale_rate": null
-    }
+  {
+    "barcode": "4902102072618",
+    "name": "Coca-Cola Classic",
+    "description": "The world's favorite soft drink since 1886.",
+    "price": 1.5,
+    "image_url": "https://example.com/coke-classic.jpg",
+    "ingredients": [
+      "Carbonated Water",
+      "Sugar",
+      "Caramel Color",
+      "Phosphoric Acid"
+    ],
+    "primary_category_id": 2,
+    "secondary_category_id": 5,
+    "tertiary_category_id": null,
+    "on_sale": true,
+    "sale_rate": 0.85,
+    "product_line_id": 1
+  },
+  {
+    "barcode": "4902102070669",
+    "name": "Coca-Cola Zero Sugar",
+    "description": "Great Coke taste, zero sugar.",
+    "price": 1.5,
+    "image_url": "https://example.com/coke-zero.jpg",
+    "ingredients": [
+      "Carbonated Water",
+      "Caramel Color",
+      "Phosphoric Acid",
+      "Aspartame"
+    ],
+    "primary_category_id": 2,
+    "secondary_category_id": 5,
+    "tertiary_category_id": null,
+    "on_sale": false,
+    "sale_rate": null,
+    "product_line_id": 1
+  },
+  {
+    "barcode": "074108000037",
+    "name": "Pringles Original",
+    "description": "Iconic potato crisps with a perfect crunch.",
+    "price": 2.99,
+    "image_url": "https://example.com/pringles-original.jpg",
+    "ingredients": [
+      "Dried Potatoes",
+      "Vegetable Oil",
+      "Rice Flour",
+      "Wheat Starch"
+    ],
+    "primary_category_id": 1,
+    "secondary_category_id": 3,
+    "tertiary_category_id": 6,
+    "on_sale": false,
+    "sale_rate": null,
+    "product_line_id": 2
+  },
+  {
+    "barcode": "074108000038",
+    "name": "Pringles Sour Cream & Onion",
+    "description": "Savory potato crisps with a tangy flavor.",
+    "price": 2.99,
+    "image_url": "https://example.com/pringles-sour-cream.jpg",
+    "ingredients": [
+      "Dried Potatoes",
+      "Vegetable Oil",
+      "Sour Cream",
+      "Onion Powder"
+    ],
+    "primary_category_id": 1,
+    "secondary_category_id": 3,
+    "tertiary_category_id": 6,
+    "on_sale": true,
+    "sale_rate": 0.9,
+    "product_line_id": 2
+  }
 ]
