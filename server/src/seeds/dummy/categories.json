@@ -1,0 +1,50 @@
+[
+    {
+        "id": 1,
+        "name": "Food",
+        "level": "primary",
+        "parent_id": null
+    },
+    {
+        "id": 2,
+        "name": "Beverages",
+        "level": "primary",
+        "parent_id": null
+    },
+    {
+        "id": 3,
+        "name": "Snacks",
+        "level": "secondary",
+        "parent_id": 1
+    },
+    {
+        "id": 4,
+        "name": "Dairy",
+        "level": "secondary",
+        "parent_id": 1
+    },
+    {
+        "id": 5,
+        "name": "Soda",
+        "level": "secondary",
+        "parent_id": 2
+    },
+    {
+        "id": 6,
+        "name": "Potato Chips",
+        "level": "tertiary",
+        "parent_id": 3
+    },
+    {
+        "id": 7,
+        "name": "Chocolate",
+        "level": "tertiary",
+        "parent_id": 3
+    },
+    {
+        "id": 8,
+        "name": "Milk",
+        "level": "tertiary",
+        "parent_id": 4
+    }
+]

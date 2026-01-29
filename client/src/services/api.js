@@ -53,6 +53,14 @@ export async function getProducts(filters = {}) {
 }
 
 /**
+ * Get all stores in hierarchical structure
+ * @returns {Promise<Array>} Array of categories with nested subcategories
+ */
+export async function getStores() {
+    return apiRequest('/stores');
+}
+
+/**
  * Get all categories in hierarchical structure
  * @returns {Promise<Array>} Array of categories with nested subcategories
  */

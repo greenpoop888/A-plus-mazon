@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.routes.products_route import router as products_router
 from src.routes.categories_route import router as categories_router
+from src.routes.stores_route import router as stores_router
 
 app = FastAPI()
 
@@ -16,6 +17,7 @@ app.add_middleware(
 
 app.include_router(products_router)
 app.include_router(categories_router)
+app.include_router(stores_router)
 
 if __name__ == "__main__":
     import uvicorn

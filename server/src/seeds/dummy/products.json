@@ -1,0 +1,50 @@
+[
+    {
+        "barcode": "4902102072618",
+        "name": "Coca-Cola Classic",
+        "description": "Refreshing carbonated soft drink.",
+        "price": 1.25,
+        "image_url": "https://example.com/cola.jpg",
+        "ingredients": [
+            "Carbonated Water",
+            "Sugar",
+            "Caramel Color",
+            "Phosphoric Acid"
+        ],
+        "primary_category_id": "beverages",
+        "on_sale": true,
+        "sale_rate": 0.9
+    },
+    {
+        "barcode": "074108000433",
+        "name": "Pringles Sour Cream & Onion",
+        "description": "Savory potato crisps with sour cream flavor.",
+        "price": 2.50,
+        "image_url": "https://example.com/pringles.jpg",
+        "ingredients": [
+            "Dried Potatoes",
+            "Vegetable Oil",
+            "Rice Flour",
+            "Wheat Starch"
+        ],
+        "primary_category_id": "snacks",
+        "secondary_category_id": "chips",
+        "on_sale": false,
+        "sale_rate": null
+    },
+    {
+        "barcode": "8850157400100",
+        "name": "Thai Jasmine Rice",
+        "description": "Premium long-grain fragrant rice.",
+        "price": 15.99,
+        "image_url": "https://example.com/rice.jpg",
+        "ingredients": [
+            "Jasmine Rice 100%"
+        ],
+        "primary_category_id": "pantry",
+        "secondary_category_id": "grains",
+        "tertiary_category_id": "rice",
+        "on_sale": false,
+        "sale_rate": null
+    }
+]
