@@ -1,15 +1,13 @@
 import os
 import sys
 import json
-from sqlmodel import Session, create_engine, select
-from dotenv import load_dotenv
-from models import Product, Category, Store, ProductLine, ProductInStore
+from sqlmodel import Session, create_engine
+from ..models import Product, Category, Store, ProductLine, ProductInStore
 from sqlalchemy import text
 from typing import List, Dict, Any
+from ..config.config import settings
 
-load_dotenv()
-DATABASE_URL = os.getenv("DATABASE_URL")
-engine = create_engine(DATABASE_URL)
+engine = create_engine(settings.DATABASE_URL)
 
 def clear_data():
     print("cleaning all data from database...")

@@ -1,62 +1,39 @@
-from typing import List, Dict, Any
+from typing import List, Optional
+from sqlmodel import Session
 from ..dao.category_dao import CategoryDAO
+from ..models import Category
 
 class CategoryController:
-    def __init__(self):
-        self.category_dao = CategoryDAO()
+    def __init__(self, session: Session):
+        self.category_dao = CategoryDAO(session)
 
-    def get_all_categories(self) -> List[Dict[str, Any]]:
-        """
-        Retrieve all categories with validation.
-
-        Returns:
-            List of category dictionaries with nested subcategories
-
-        Raises:
-            Exception: If there's an error retrieving categories
-        """
+    def get_all_categories(self) -> List[Category]:
         try:
-            categories = self.category_dao.get_all_categories()
-
-            # Validate the category structure
-            self._validate_category_structure(categories)
-
-            return categories
-
+            return self.category_dao.get_all()
         except Exception as e:
-            raise Exception(f"Error retrieving categories: {str(e)}")
+            raise Exception(f"Controller retrive cateogires error: {str(e)}")
 
-    def _validate_category_structure(self, categories: List[Dict[str, Any]]) -> None:
-        """
-        Validate the structure of category data.
+    def get_category_tree(self) -> List[dict]:
+        flat_categories = self.category_dao.get_all()
+        
+        category_map = {c.id: {**c.model_dump(), "subcategories": []} for c in flat_categories}
+        
+        tree = []
 
-        Args:
-            categories: List of category dictionaries to validate
+        for c in flat_categories:
+            cat_id = c.id
+            parent_id = c.parent_id
+            
+            if parent_id is None:
+                tree.append(category_map[cat_id])
+            else:
+                if parent_id in category_map:
+                    category_map[parent_id]["subcategories"].append(category_map[cat_id])
+        
+        return tree
 
-        Raises:
-            ValueError: If validation fails
-        """
-        if not isinstance(categories, list):
-            raise ValueError("Categories data must be a list")
+    def get_primary_categories(self) -> List[Category]:
+        return self.category_dao.get_by_level("primary")
 
-        for category in categories:
-            if not isinstance(category, dict):
-                raise ValueError("Each category must be a dictionary")
-
-            # Check required fields
-            if 'id' not in category:
-                raise ValueError("Category missing required 'id' field")
-            if 'name' not in category:
-                raise ValueError("Category missing required 'name' field")
-
-            # Validate field types
-            if not isinstance(category['id'], str):
-                raise ValueError("Category 'id' must be a string")
-            if not isinstance(category['name'], str):
-                raise ValueError("Category 'name' must be a string")
-
-            # Validate subcategories if present
-            if 'subcategories' in category:
-                if not isinstance(category['subcategories'], list):
-                    raise ValueError("Category 'subcategories' must be a list")
-                self._validate_category_structure(category['subcategories'])
+    def get_by_id(self, category_id: int) -> Optional[Category]:
+        return self.category_dao.get_by_id(category_id)

@@ -28,6 +28,7 @@ async function apiRequest(endpoint, options = {}) {
 /**
  * Get products with optional category filtering
  * @param {Object} filters - Optional category filters
+ * @param {string} filters.store - store ID
  * @param {string} filters.primary_category - Primary category ID
  * @param {string} filters.secondary_category - Secondary category ID
  * @param {string} filters.tertiary_category - Tertiary category ID
@@ -36,6 +37,9 @@ async function apiRequest(endpoint, options = {}) {
 export async function getProducts(filters = {}) {
     const params = new URLSearchParams();
 
+    if (filters.store) {
+        params.append('store_id', filters.store);
+    }
     if (filters.primary_category) {
         params.append('primary_category', filters.primary_category);
     }
@@ -47,7 +51,7 @@ export async function getProducts(filters = {}) {
     }
 
     const queryString = params.toString();
-    const endpoint = `/product${queryString ? `?${queryString}` : ''}`;
+    const endpoint = `/products${queryString ? `?${queryString}` : ''}`;
 
     return apiRequest(endpoint);
 }

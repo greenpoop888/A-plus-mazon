@@ -2,16 +2,11 @@ import sys
 import os
 from dotenv import load_dotenv
 from sqlmodel import create_engine, SQLModel
-from models import Product, Category, Store, ProductLine, ProductInStore
+from ..models import Product, Category, Store, ProductLine, ProductInStore
+from ..config.config import settings
 
-load_dotenv()
-
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-engine = create_engine(DATABASE_URL, echo=True) 
+engine = create_engine(settings.DATABASE_URL, echo=True) 
 def create_db_and_tables():
-    print(f"connection: {DATABASE_URL.split('@')[-1]}")
-    
     detected_tables = SQLModel.metadata.tables.keys()
     if not detected_tables:
         print("warning: no tables were detected in the models. Please check your model definitions.")

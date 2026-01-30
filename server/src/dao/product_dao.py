@@ -1,62 +1,61 @@
-import json
-import os
 from typing import List, Optional
 from ..models.product import Product
+from ..models.product_in_store import ProductInStore
+from sqlmodel import Session, select, col
+from typing import List, Dict, Any
+from sqlalchemy.orm import joinedload
+
 
 class ProductDAO:
-    def __init__(self):
-        self.products = self._load_dummy_data()
+    def __init__(self, session: Session):
+        self.session = session
 
-    def _load_dummy_data(self) -> List[Product]:
-        """Load products from dummy data file"""
-        dummy_file_path = os.path.join(os.path.dirname(__file__), '..', '..', 'dummy', 'products.json')
-        try:
-            with open(dummy_file_path, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-                return [Product(**item) for item in data]
-        except FileNotFoundError:
-            print(f"Warning: Dummy data file not found at {dummy_file_path}")
-            return []
-        except json.JSONDecodeError as e:
-            print(f"Error parsing dummy data: {e}")
-            return []
+    from sqlalchemy.orm import joinedload
 
     def get_products(
         self,
-        primary_category: Optional[str] = None,
-        secondary_category: Optional[str] = None,
-        tertiary_category: Optional[str] = None
-    ) -> List[Product]:
-        """
-        Retrieve products with optional category filtering.
-        Supports up to three levels of category filtering.
-
-        Args:
-            primary_category: Filter by primary category ID
-            secondary_category: Filter by secondary category ID
-            tertiary_category: Filter by tertiary category ID
-
-        Returns:
-            List of Product objects matching the criteria
-        """
-        filtered_products = self.products
+        store_id: int,
+        primary_category: Optional[int] = None,
+        secondary_category: Optional[int] = None,
+        tertiary_category: Optional[int] = None
+    ) -> List[Dict[str, Any]]:
+        statement = (
+            select(Product)
+            .join(ProductInStore)
+            .options(
+                joinedload(Product.primary_category),
+                joinedload(Product.secondary_category),
+                joinedload(Product.tertiary_category),
+                joinedload(Product.product_line)
+            )
+            .where(ProductInStore.store_id == store_id)
+        )
 
         if primary_category:
-            filtered_products = [
-                p for p in filtered_products
-                if p.primary_category_id == primary_category
-            ]
-
+            statement = statement.where(Product.primary_category_id == primary_category)
         if secondary_category:
-            filtered_products = [
-                p for p in filtered_products
-                if p.secondary_category_id == secondary_category
-            ]
+            statement = statement.where(Product.secondary_category_id == secondary_category)
+        if tertiary_category:   
+            statement = statement.where(Product.tertiary_category_id == tertiary_category)
+        
+        products = self.session.exec(statement).unique().all()
 
-        if tertiary_category:
-            filtered_products = [
-                p for p in filtered_products
-                if p.tertiary_category_id == tertiary_category
-            ]
+        results = []
+        for p in products:
+            p_dict = p.model_dump()
+            p_dict["primary_category_name"] = p.primary_category.name if p.primary_category else None
+            p_dict["product_line_name"] = p.product_line.name if p.product_line else None
+            results.append(p_dict)
 
-        return filtered_products
+        return results
+
+
+    def get_product_quantity(self, store_id: int, product_id: int) -> Optional[int]:
+        statement = select(ProductInStore).where(
+            (ProductInStore.store_id == store_id) &
+            (ProductInStore.product_id == product_id)
+        )
+        product_in_store = self.session.exec(statement).first()
+        if product_in_store:
+            return product_in_store.quantity
+        return None

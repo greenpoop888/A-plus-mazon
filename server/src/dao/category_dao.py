@@ -1,29 +1,32 @@
-import json
-import os
-from typing import List, Dict, Any
+from typing import List, Optional
+from sqlmodel import Session, select, col
+from ..models import Category
 
 class CategoryDAO:
-    def __init__(self):
-        self.categories = self._load_dummy_data()
+    def __init__(self, session: Session):
+        self.session = session
 
-    def _load_dummy_data(self) -> List[Dict[str, Any]]:
-        """Load categories from dummy data file"""
-        dummy_file_path = os.path.join(os.path.dirname(__file__), '..', '..', 'dummy', 'categories.json')
-        try:
-            with open(dummy_file_path, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except FileNotFoundError:
-            print(f"Warning: Dummy categories file not found at {dummy_file_path}")
-            return []
-        except json.JSONDecodeError as e:
-            print(f"Error parsing dummy categories data: {e}")
-            return []
+    def get_all(self) -> List[Category]:
+        statement = select(Category)
+        return self.session.exec(statement).all()
 
-    def get_all_categories(self) -> List[Dict[str, Any]]:
-        """
-        Retrieve all categories in hierarchical structure.
+    def get_by_id(self, category_id: int) -> Optional[Category]:
+        return self.session.get(Category, category_id)
 
-        Returns:
-            List of category dictionaries with nested subcategories
-        """
-        return self.categories
+    def get_by_level(self, level: str) -> List[Category]:
+        statement = select(Category).where(Category.level == level)
+        return self.session.exec(statement).all()
+
+    def get_subcategories(self, parent_id: int) -> List[Category]:
+        statement = select(Category).where(Category.parent_id == parent_id)
+        return self.session.exec(statement).all()
+
+    def get_by_name(self, name: str) -> Optional[Category]:
+        statement = select(Category).where(col(Category.name).ilike(f"%{name}%"))
+        return self.session.exec(statement).first()
+
+    def create(self, category_data: Category) -> Category:
+        self.session.add(category_data)
+        self.session.commit()
+        self.session.refresh(category_data)
+        return category_data

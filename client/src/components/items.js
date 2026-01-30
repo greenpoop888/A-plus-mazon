@@ -2,16 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { Card, Image, Message, Label, Icon } from 'semantic-ui-react';
 import { getProducts } from '../services/api';
 
-const Items = ({ primaryCategory, secondaryCategory, tertiaryCategory }) => {
+const Items = ({ store, primaryCategory, secondaryCategory, tertiaryCategory }) => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        if (!store) {
+            setProducts([]);
+            setLoading(false);
+            return;
+        }
+
         const fetchProducts = async () => {
             try {
                 setLoading(true);
                 const filters = {};
+                if (store) filters.store = store;
                 if (primaryCategory) filters.primary_category = primaryCategory;
                 if (secondaryCategory) filters.secondary_category = secondaryCategory;
                 if (tertiaryCategory) filters.tertiary_category = tertiaryCategory;
@@ -28,7 +35,7 @@ const Items = ({ primaryCategory, secondaryCategory, tertiaryCategory }) => {
             }
         };
         fetchProducts();
-    }, [primaryCategory, secondaryCategory, tertiaryCategory]);
+    }, [store, primaryCategory, secondaryCategory, tertiaryCategory]);
 
     if (loading) return <Message info>Loading products...</Message>;
     if (error) return <Message error>{error}</Message>;

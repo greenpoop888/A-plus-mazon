@@ -27,7 +27,6 @@ Once the service is running, visit:
 ## Seed data set up
 ```bash
 cd server
-cd src
-python -m seeds.database
-python -m seeds.dummy_data
+python -m src.seeds.database
+python -m src.seeds.dummy_data
 ```

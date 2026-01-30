@@ -1,13 +1,16 @@
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, Query, HTTPException, Depends
 from typing import Optional, List
 from ..models.product import Product
 from ..controllers.product_controller import ProductController
+from ..database.database import get_session
+from sqlmodel import Session
 
 router = APIRouter()
-product_controller = ProductController()
 
-@router.get("/api/product", response_model=List[Product])
+@router.get("/api/products", response_model=List[Product])
 async def get_products(
+    session: Session = Depends(get_session),
+    store_id: int = Query(..., description="Store ID to filter products"),
     primary_category: Optional[str] = Query(None, description="Filter by primary category ID"),
     secondary_category: Optional[str] = Query(None, description="Filter by secondary category ID"),
     tertiary_category: Optional[str] = Query(None, description="Filter by tertiary category ID")
@@ -16,7 +19,9 @@ async def get_products(
     Retrieve a list of products with optional filtering by category.
     """
     try:
-        return product_controller.get_products(
+        controller = ProductController(session)
+        return controller.get_products_by_store(
+            store_id=store_id,
             primary_category=primary_category,
             secondary_category=secondary_category,
             tertiary_category=tertiary_category

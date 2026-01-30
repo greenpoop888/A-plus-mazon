@@ -1,62 +1,51 @@
-import React, { useState, useEffect } from 'react';
-import { Dropdown, Button } from 'semantic-ui-react';
-import { getStores as getStores } from '../services/api';
+import React, { useEffect, useState } from 'react';
+import { Dropdown } from 'semantic-ui-react';
+import { getStores } from '../services/api';
 
-const Stories = () => {
+
+const Stories = ({ store, onStoreChange }) => {
     const [stores, setStores] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [selectedStore, setSelectedStore] = useState('');
 
     useEffect(() => {
-        const fetchCategories = async () => {
+        const fetchStoresData = async () => {
             try {
-                setLoading(true);
                 const storeData = await getStores();
-
-                const transformed = storeData.map(store => ({
-                    key: store.id,
-                    text: store.name,
-                    value: store.id
+                const transformed = storeData.map(s => ({
+                    key: s.id,
+                    text: s.name,
+                    value: s.id
                 }));
-
                 setStores(transformed);
-                setError(null);
+
+                if (transformed.length > 0 && !store) {
+                    onStoreChange(transformed[0].value);
+                }
             } catch (err) {
-                console.error('Error fetching categories:', err);
-                setError('Failed to load categories');
+                console.error(err);
             } finally {
                 setLoading(false);
             }
         };
-
-        fetchCategories();
+        fetchStoresData();
     }, []);
 
-    const handleStoreChange = (e, { value }) => {
-        setSelectedStore(value);
+    const handleDropdownChange = (e, { value }) => {
+        if (value !== store) {
+            onStoreChange(value);
+        }
     };
 
-    const handleReset = () => {
-        setSelectedStore('');
-    };
-
-    if (loading) return <div>Loading Store...</div>;
-    if (error) return <div>Error: {error}</div>;
+    if (loading) return <span>Loading...</span>;
 
     return (
-        <div>
-            <Dropdown
-                placeholder='Select Store'
-                search
-                selection
-                options={stores}
-                value={selectedStore}
-                onChange={handleStoreChange}
-                style={{ marginRight: '10px' }}
-            />
-            <Button onClick={handleReset} color='orange'>Reset</Button>
-        </div>
+        <Dropdown
+            placeholder='Select Store'
+            selection
+            options={stores}
+            value={store}
+            onChange={handleDropdownChange}
+        />
     );
 };
 

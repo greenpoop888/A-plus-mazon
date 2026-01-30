@@ -5,11 +5,16 @@ import Items from '../components/items';
 import Stories from '../components/store_selection';
 
 const Home = () => {
+    const [store, setStore] = useState('');
     const [selectedCategories, setSelectedCategories] = useState({
         primary: '',
         secondary: '',
         tertiary: ''
     });
+
+    const handleStoreChange = (store) => {
+        setStore(store);
+    }
 
     const handleCategoryChange = (categories) => {
         setSelectedCategories(categories);
@@ -26,7 +31,7 @@ const Home = () => {
                             </Header>
                         </Grid.Column>
                         <Grid.Column computer={5} tablet={11} mobile={16} floated='right'>
-                            <Stories />
+                            <Stories store={store} onStoreChange={handleStoreChange} />
                         </Grid.Column>
                     </Grid.Row>
                     <Grid.Row verticalAlign='middle'>
@@ -37,6 +42,7 @@ const Home = () => {
                 </Grid>
             </Segment>
             <Items
+                store={store}
                 primaryCategory={selectedCategories.primary}
                 secondaryCategory={selectedCategories.secondary}
                 tertiaryCategory={selectedCategories.tertiary}
