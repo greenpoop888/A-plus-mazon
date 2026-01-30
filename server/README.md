@@ -28,5 +28,5 @@ Once the service is running, visit:
 ```bash
 cd server
 python -m src.seeds.database
-python -m src.seeds.dummy_data
+python -m src.seeds.seed_data
 ```

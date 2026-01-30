@@ -49,6 +49,7 @@ def seed_from_json(filename, model):
         print(f"Seeding completed successfully for {model.__name__}.")
 
 if __name__ == "__main__":
+    clear_data()
     seed_from_json('categories.json', Category)
     seed_from_json('stores.json', Store)
     seed_from_json('product_line.json', ProductLine)

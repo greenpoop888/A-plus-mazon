@@ -25,17 +25,17 @@ const Home = () => {
             <Segment>
                 <Grid>
                     <Grid.Row>
-                        <Grid.Column computer={5} tablet={5} mobile={16}>
+                        <Grid.Column computer={4} tablet={5} mobile={16}>
                             <Header as='h1' style={{ margin: 0 }}>
                                 <Label size='massive' color='orange'>A+mazon⟷</Label>
                             </Header>
                         </Grid.Column>
-                        <Grid.Column computer={5} tablet={11} mobile={16} floated='right'>
+                        <Grid.Column computer={4} tablet={11} mobile={16} floated='right'>
                             <Stories store={store} onStoreChange={handleStoreChange} />
                         </Grid.Column>
                     </Grid.Row>
                     <Grid.Row verticalAlign='middle'>
-                        <Grid.Column computer={12} tablet={11} mobile={16}>
+                        <Grid.Column computer={16} tablet={16} mobile={16}>
                             <Categories onCategoryChange={handleCategoryChange} />
                         </Grid.Column>
                     </Grid.Row>

@@ -1,10 +1,11 @@
 [
   {
+    "id": 1,
     "barcode": "4902102072618",
     "name": "Coca-Cola Classic",
     "description": "The world's favorite soft drink since 1886.",
     "price": 1.5,
-    "image_url": "https://example.com/coke-classic.jpg",
+    "image_url": "https://picsum.photos/id/225/300/300",
     "ingredients": [
       "Carbonated Water",
       "Sugar",
@@ -19,11 +20,12 @@
     "product_line_id": 1
   },
   {
+    "id": 2,
     "barcode": "4902102070669",
     "name": "Coca-Cola Zero Sugar",
     "description": "Great Coke taste, zero sugar.",
     "price": 1.5,
-    "image_url": "https://example.com/coke-zero.jpg",
+    "image_url": "https://picsum.photos/id/226/300/300",
     "ingredients": [
       "Carbonated Water",
       "Caramel Color",
@@ -38,16 +40,35 @@
     "product_line_id": 1
   },
   {
+    "id": 3,
+    "barcode": "049000028904",
+    "name": "Coca-Cola Cherry",
+    "description": "Classic Coca-Cola with a blast of cherry flavor.",
+    "price": 1.75,
+    "image_url": "https://picsum.photos/id/227/300/300",
+    "ingredients": [
+      "Carbonated Water",
+      "High Fructose Corn Syrup",
+      "Natural Flavors"
+    ],
+    "primary_category_id": 2,
+    "secondary_category_id": 5,
+    "tertiary_category_id": null,
+    "on_sale": false,
+    "sale_rate": null,
+    "product_line_id": 1
+  },
+  {
+    "id": 4,
     "barcode": "074108000037",
     "name": "Pringles Original",
     "description": "Iconic potato crisps with a perfect crunch.",
     "price": 2.99,
-    "image_url": "https://example.com/pringles-original.jpg",
+    "image_url": "https://picsum.photos/id/228/300/300",
     "ingredients": [
       "Dried Potatoes",
       "Vegetable Oil",
-      "Rice Flour",
-      "Wheat Starch"
+      "Rice Flour"
     ],
     "primary_category_id": 1,
     "secondary_category_id": 3,
@@ -57,11 +78,12 @@
     "product_line_id": 2
   },
   {
+    "id": 5,
     "barcode": "074108000038",
     "name": "Pringles Sour Cream & Onion",
     "description": "Savory potato crisps with a tangy flavor.",
     "price": 2.99,
-    "image_url": "https://example.com/pringles-sour-cream.jpg",
+    "image_url": "https://picsum.photos/id/229/300/300",
     "ingredients": [
       "Dried Potatoes",
       "Vegetable Oil",
@@ -74,5 +96,83 @@
     "on_sale": true,
     "sale_rate": 0.9,
     "product_line_id": 2
+  },
+  {
+    "id": 6,
+    "barcode": "074108000039",
+    "name": "Pringles BBQ",
+    "description": "Bold and smoky barbecue flavored crisps.",
+    "price": 2.99,
+    "image_url": "https://picsum.photos/id/230/300/300",
+    "ingredients": [
+      "Dried Potatoes",
+      "Sugar",
+      "Tomato Powder",
+      "Smoked Flavor"
+    ],
+    "primary_category_id": 1,
+    "secondary_category_id": 3,
+    "tertiary_category_id": 6,
+    "on_sale": false,
+    "sale_rate": null,
+    "product_line_id": 2
+  },
+  {
+    "id": 7,
+    "barcode": "009542004883",
+    "name": "Lindt Excellence Dark 70%",
+    "description": "Rich, intense dark chocolate with a silky finish.",
+    "price": 4.5,
+    "image_url": "https://picsum.photos/id/231/300/300",
+    "ingredients": [
+      "Chocolate",
+      "Cocoa Butter",
+      "Sugar",
+      "Vanilla"
+    ],
+    "primary_category_id": 1,
+    "secondary_category_id": 3,
+    "tertiary_category_id": 7,
+    "on_sale": true,
+    "sale_rate": 0.8,
+    "product_line_id": 3
+  },
+  {
+    "id": 8,
+    "barcode": "009542430217",
+    "name": "Lindt Excellence Sea Salt",
+    "description": "Dark chocolate with a touch of hand-harvested sea salt.",
+    "price": 4.5,
+    "image_url": "https://picsum.photos/id/232/300/300",
+    "ingredients": [
+      "Chocolate",
+      "Cocoa Butter",
+      "Sugar",
+      "Sea Salt"
+    ],
+    "primary_category_id": 1,
+    "secondary_category_id": 3,
+    "tertiary_category_id": 7,
+    "on_sale": false,
+    "sale_rate": null,
+    "product_line_id": 3
+  },
+  {
+    "id": 9,
+    "barcode": "041383090013",
+    "name": "Organic Whole Milk",
+    "description": "Fresh, vitamin D enriched organic milk.",
+    "price": 5.99,
+    "image_url": "https://picsum.photos/id/233/300/300",
+    "ingredients": [
+      "Organic Milk",
+      "Vitamin D3"
+    ],
+    "primary_category_id": 1,
+    "secondary_category_id": 4,
+    "tertiary_category_id": 8,
+    "on_sale": false,
+    "sale_rate": null,
+    "product_line_id": null
   }
 ]

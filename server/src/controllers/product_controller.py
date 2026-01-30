@@ -15,7 +15,7 @@ class ProductController:
         primary_category: Optional[str] = None,
         secondary_category: Optional[str] = None,
         tertiary_category: Optional[str] = None
-    ) -> List[Product]:
+    ) -> List[dict]:
         try:
             return self.product_dao.get_products(
                 store_id,
@@ -25,3 +25,13 @@ class ProductController:
             )
         except Exception as e:
             raise Exception(f"Controller retrieve products error: {str(e)}")
+
+    def get_quantities_by_store_and_product_ids(
+        self,
+        store_id: int,
+        product_ids: List[int]
+    ) -> List[dict]:
+        try:
+            return self.product_dao.get_quantities(store_id, product_ids)
+        except Exception as e:
+            raise Exception(f"Controller retrieve quantities error: {str(e)}")

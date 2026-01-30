@@ -40,10 +40,14 @@ const Stories = ({ store, onStoreChange }) => {
 
     return (
         <Dropdown
-            placeholder='Select Store'
-            selection
+            button
+            className='icon'
+            floating
+            labeled
+            icon='warehouse'
             options={stores}
-            value={store}
+            search
+            text={stores.find(s => s.value === store)?.text || 'Select Store'}
             onChange={handleDropdownChange}
         />
     );

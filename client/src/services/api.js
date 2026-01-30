@@ -25,6 +25,17 @@ async function apiRequest(endpoint, options = {}) {
     }
 }
 
+export async function getQuantities(storeId, productIds) {
+    const idsString = productIds.join(',');
+
+    const params = new URLSearchParams();
+    params.append('store_id', storeId);
+    params.append('product_ids', idsString);
+
+    const endpoint = `/quantities?${params.toString()}`;
+    return apiRequest(endpoint);
+}
+
 /**
  * Get products with optional category filtering
  * @param {Object} filters - Optional category filters

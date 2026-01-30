@@ -7,7 +7,7 @@ from sqlmodel import Session
 
 router = APIRouter()
 
-@router.get("/api/products", response_model=List[Product])
+@router.get("/api/products")
 async def get_products(
     session: Session = Depends(get_session),
     store_id: int = Query(..., description="Store ID to filter products"),
@@ -30,3 +30,28 @@ async def get_products(
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+
+@router.get("/api/quantities")
+async def get_quantities(
+    session: Session = Depends(get_session),
+    store_id: int = Query(..., description="Store ID to filter products"),
+    product_ids: str = Query(..., description="List of product IDs to get quantities for")
+):
+    """
+    Retrieve quantities for specific products in a store.
+    """
+    try:
+        id_list = [int(pid) for pid in product_ids.split(',')]
+        controller = ProductController(session)
+        return controller.get_quantities_by_store_and_product_ids(
+            store_id=store_id,
+            product_ids=id_list
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+    tertiary_category: Optional[str] = Query(None, description="Filter by tertiary category ID")
+
+   
