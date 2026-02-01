@@ -2,11 +2,6 @@ import React from 'react';
 import { Card, Image, Label, Icon } from 'semantic-ui-react';
 
 const ProductItem = ({ product, stock }) => {
-    const renderStockInfo = () => {
-        if (stock === null) return 'Loading...';
-        return stock > 0 ? `${stock} in stock` : 'Out of stock';
-    };
-
     const renderStockUI = () => {
         if (stock === null) {
             return (

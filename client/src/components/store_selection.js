@@ -28,6 +28,7 @@ const Stories = ({ store, onStoreChange }) => {
             }
         };
         fetchStoresData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleDropdownChange = (e, { value }) => {
