@@ -5,7 +5,7 @@
     "name": "Coca-Cola Classic",
     "description": "The world's favorite soft drink since 1886.",
     "price": 1.5,
-    "image_url": "https://picsum.photos/id/225/300/300",
+    "image_url": "https://cloud-computing-project-product-images-5f1b971d.s3.us-east-1.amazonaws.com/Beverages/Soda/Coca-Cola+Classic.jpg",
     "ingredients": [
       "Carbonated Water",
       "Sugar",
@@ -25,7 +25,7 @@
     "name": "Coca-Cola Zero Sugar",
     "description": "Great Coke taste, zero sugar.",
     "price": 1.5,
-    "image_url": "https://picsum.photos/id/226/300/300",
+    "image_url": "https://cloud-computing-project-product-images-5f1b971d.s3.us-east-1.amazonaws.com/Beverages/Soda/Coca-Cola+Zero+Sugar.jpg",
     "ingredients": [
       "Carbonated Water",
       "Caramel Color",
@@ -45,7 +45,7 @@
     "name": "Coca-Cola Cherry",
     "description": "Classic Coca-Cola with a blast of cherry flavor.",
     "price": 1.75,
-    "image_url": "https://picsum.photos/id/227/300/300",
+    "image_url": "https://cloud-computing-project-product-images-5f1b971d.s3.us-east-1.amazonaws.com/Beverages/Soda/Coca-Cola+Cherry.jpg",
     "ingredients": [
       "Carbonated Water",
       "High Fructose Corn Syrup",
@@ -64,7 +64,7 @@
     "name": "Pringles Original",
     "description": "Iconic potato crisps with a perfect crunch.",
     "price": 2.99,
-    "image_url": "https://picsum.photos/id/228/300/300",
+    "image_url": "https://cloud-computing-project-product-images-5f1b971d.s3.us-east-1.amazonaws.com/Food/Snacks/Potato+Chips/Pringles+Original.jpg",
     "ingredients": [
       "Dried Potatoes",
       "Vegetable Oil",
@@ -83,7 +83,7 @@
     "name": "Pringles Sour Cream & Onion",
     "description": "Savory potato crisps with a tangy flavor.",
     "price": 2.99,
-    "image_url": "https://picsum.photos/id/229/300/300",
+    "image_url": "https://cloud-computing-project-product-images-5f1b971d.s3.us-east-1.amazonaws.com/Food/Snacks/Potato+Chips/Pringles+Sour+Cream+&+Onion.jpg",
     "ingredients": [
       "Dried Potatoes",
       "Vegetable Oil",
@@ -103,7 +103,7 @@
     "name": "Pringles BBQ",
     "description": "Bold and smoky barbecue flavored crisps.",
     "price": 2.99,
-    "image_url": "https://picsum.photos/id/230/300/300",
+    "image_url": "https://cloud-computing-project-product-images-5f1b971d.s3.us-east-1.amazonaws.com/Food/Snacks/Potato+Chips/Pringles+BBQ.jpg",
     "ingredients": [
       "Dried Potatoes",
       "Sugar",
@@ -123,7 +123,7 @@
     "name": "Lindt Excellence Dark 70%",
     "description": "Rich, intense dark chocolate with a silky finish.",
     "price": 4.5,
-    "image_url": "https://picsum.photos/id/231/300/300",
+    "image_url": "https://cloud-computing-project-product-images-5f1b971d.s3.us-east-1.amazonaws.com/Food/Snacks/Chocolate/Lindt+Excellence+Dark+70%.jpg",
     "ingredients": [
       "Chocolate",
       "Cocoa Butter",
@@ -143,7 +143,7 @@
     "name": "Lindt Excellence Sea Salt",
     "description": "Dark chocolate with a touch of hand-harvested sea salt.",
     "price": 4.5,
-    "image_url": "https://picsum.photos/id/232/300/300",
+    "image_url": "https://cloud-computing-project-product-images-5f1b971d.s3.us-east-1.amazonaws.com/Food/Snacks/Chocolate/Lindt+Excellence+Sea+Salt.jpg",
     "ingredients": [
       "Chocolate",
       "Cocoa Butter",
@@ -163,7 +163,7 @@
     "name": "Organic Whole Milk",
     "description": "Fresh, vitamin D enriched organic milk.",
     "price": 5.99,
-    "image_url": "https://picsum.photos/id/233/300/300",
+    "image_url": "https://cloud-computing-project-product-images-5f1b971d.s3.us-east-1.amazonaws.com/Food/Dairy/Milk/Organic+Whole+Milk.jpg",
     "ingredients": [
       "Organic Milk",
       "Vitamin D3"

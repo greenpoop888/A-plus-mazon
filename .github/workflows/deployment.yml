@@ -91,6 +91,24 @@ jobs:
 
             echo "FastAPI restarted successfully"
           EOF
+
+      - name: Run Database Migrations and Seeding
+        run: |
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            set -e
+            PROJECT_ROOT="/home/ec2-user/project"
+            cd "$PROJECT_ROOT/server"
+
+            source venv/bin/activate
+
+            echo "Running database.py to setup tables..."
+            python3 database.py
+
+            echo "Running data_set.py to seed data..."
+            python3 data_set.py
+
+            echo "Database setup completed successfully."
+          EOF
           
       - name: Setup systemd service on EC2
         run: |
