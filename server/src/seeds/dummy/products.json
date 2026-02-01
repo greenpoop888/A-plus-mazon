@@ -103,7 +103,7 @@
     "name": "Pringles BBQ",
     "description": "Bold and smoky barbecue flavored crisps.",
     "price": 2.99,
-    "image_url": "https://cloud-computing-project-product-images-5f1b971d.s3.us-east-1.amazonaws.com/Food/Snacks/Potato+Chips/Pringles+BBQ.jpg",
+    "image_url": "https://cloud-computing-project-product-images-5f1b971d.s3.us-east-1.amazonaws.com/Food/Snacks/Potato+Chips/Pringles+BBQ.png",
     "ingredients": [
       "Dried Potatoes",
       "Sugar",
@@ -123,7 +123,7 @@
     "name": "Lindt Excellence Dark 70%",
     "description": "Rich, intense dark chocolate with a silky finish.",
     "price": 4.5,
-    "image_url": "https://cloud-computing-project-product-images-5f1b971d.s3.us-east-1.amazonaws.com/Food/Snacks/Chocolate/Lindt+Excellence+Dark+70%.jpg",
+    "image_url": "https://cloud-computing-project-product-images-5f1b971d.s3.us-east-1.amazonaws.com/Food/Snacks/Chocolate/Lindt+Excellence+Dark+70%25.jpg",
     "ingredients": [
       "Chocolate",
       "Cocoa Butter",
