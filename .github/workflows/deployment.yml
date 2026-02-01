@@ -46,7 +46,7 @@ jobs:
             mkdir -p "$PROJECT_ROOT"
 
             if [ ! -d "$PROJECT_ROOT/.git" ]; then
-                git clone git@github.com:seattle-university-cs-cloud-computing/homework-series-xinrou-xiao.git "$PROJECT_ROOT"
+                git clone -b second_assignment git@github.com:seattle-university-cs-cloud-computing/homework-series-xinrou-xiao.git "$PROJECT_ROOT"
             else
                 cd "$PROJECT_ROOT"
                 git fetch --all
