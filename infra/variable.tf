@@ -39,3 +39,8 @@ variable "s3_environment" {
   type        = string
   default     = "dev"
 }
+
+variable "db_password" {
+  type      = string
+  sensitive = true
+}

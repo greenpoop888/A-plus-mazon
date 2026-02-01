@@ -35,3 +35,7 @@ output "eip_ip" {
   description = "The public Elastic IP address assigned to the EC2 instance"
   value       = aws_eip.app_eip.public_ip
 }
+
+output "rds_endpoint" {
+  value = aws_db_instance.postgres.endpoint
+}

@@ -1,5 +1,9 @@
+resource "random_id" "id" {
+  byte_length = 4
+}
+
 resource "aws_s3_bucket" "app_bucket" {
-  bucket = var.s3_bucket_name
+  bucket = "${var.s3_bucket_name}-${random_id.id.hex}"
 
   tags = {
     Name        = var.s3_bucket_name

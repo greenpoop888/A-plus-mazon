@@ -1,5 +1,5 @@
 resource "aws_security_group" "app_sg" {
-  name        = "app-sg"
+  name        = "app-sg-${random_id.id.hex}"
   description = "Allow SSH and web traffic"
 
   ingress {

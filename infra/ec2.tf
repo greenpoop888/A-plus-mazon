@@ -8,7 +8,7 @@ resource "aws_instance" "app_server" {
   ]
 
   tags = {
-    Name = var.ec2_instance_name
+    Name = "${var.ec2_instance_name}-${random_id.id.hex}"
   }
 
   user_data = <<-EOF

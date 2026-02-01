@@ -3,6 +3,6 @@ resource "aws_eip" "app_eip" {
   domain   = "vpc"
 
   tags = {
-    Name = "${var.ec2_instance_name}-eip"
+    Name = "${var.ec2_instance_name}-eip-${random_id.id.hex}"
   }
 }
