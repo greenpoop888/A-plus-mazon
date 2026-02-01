@@ -30,6 +30,9 @@ jobs:
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             set -e
             
+            mkdir -p ~/.ssh
+            ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+
             if ! command -v git &> /dev/null; then
                 sudo yum install -y git
             fi
