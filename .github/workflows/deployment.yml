@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo (for Actions)
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Setup SSH to EC2
@@ -19,61 +19,38 @@ jobs:
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
-      
+
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 20
 
-      - name: Build frontend and copy to EC2
-        run: |
-          cd client
-          npm install
-          npm run build
-          
-          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -r build/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/frontend_build
-          
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            sudo mkdir -p /var/www/react
-            sudo rm -rf /var/www/react/*
-            sudo cp -r ~/frontend_build/* /var/www/react/
-            rm -rf ~/frontend_build
-            sudo chown -R nginx:nginx /var/www/react
-          EOF
-
-      - name: Deploy to EC2
+      - name: Deploy Backend and Environment
         run: |
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             set -e
+            
             if ! command -v git &> /dev/null; then
                 sudo yum install -y git
             fi
 
             if ! command -v python3.11 &> /dev/null; then
-                echo "Python 3.11 not found, installing..."
                 sudo yum update -y
                 sudo yum install -y python3.11 python3.11-devel python3.11-pip
-            else
-                echo "Python 3.11 already installed"
             fi
 
             PROJECT_ROOT="/home/ec2-user/project"
             mkdir -p "$PROJECT_ROOT"
 
             if [ ! -d "$PROJECT_ROOT/.git" ]; then
-                echo "Directory doesn't exist or is not a git repo, cloning..."
-                mkdir -p ~/project
-                cd ~/project
                 git clone git@github.com:seattle-university-cs-cloud-computing/homework-series-xinrou-xiao.git "$PROJECT_ROOT"
             else
-                echo "Project directory exists, pulling latest changes..."
                 cd "$PROJECT_ROOT"
                 git fetch --all
-                git reset --hard origin/main
+                git reset --hard origin/second_assignment
             fi
 
             cd "$PROJECT_ROOT/server"
-
             echo "DATABASE_URL=${{ secrets.DB_URL }}" > .env
 
             if [ ! -d "venv" ]; then
@@ -81,36 +58,21 @@ jobs:
             fi
 
             source venv/bin/activate
-
             pip install --upgrade pip
             pip install -r requirements.txt
-
-            pkill -f "uvicorn main:app" || true
-
-            nohup uvicorn main:app --host 0.0.0.0 --port 8000 > ~/uvicorn.log 2>&1 &
-
-            echo "FastAPI restarted successfully"
           EOF
 
-      - name: Run Database Migrations and Seeding
+      - name: Run Database Migrations
         run: |
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             set -e
-            PROJECT_ROOT="/home/ec2-user/project"
-            cd "$PROJECT_ROOT/server"
-
+            cd /home/ec2-user/project/server
             source venv/bin/activate
-
-            echo "Running database.py to setup tables..."
             python3 database.py
-
-            echo "Running data_set.py to seed data..."
             python3 data_set.py
-
-            echo "Database setup completed successfully."
           EOF
-          
-      - name: Setup systemd service on EC2
+
+      - name: Setup systemd service
         run: |
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             SERVICE_CONTENT="[Unit]
@@ -127,34 +89,37 @@ jobs:
             WantedBy=multi-user.target"
 
             SERVICE_FILE="/etc/systemd/system/myproject.service"
-
-            if [ ! -f "$SERVICE_FILE" ]; then
-              echo "Creating systemd service file..."
-              
-              echo "$SERVICE_CONTENT" | sudo tee $SERVICE_FILE > /dev/null
-              
-              sudo systemctl daemon-reload
-              sudo systemctl enable myproject.service
-              sudo systemctl start myproject.service
-              echo "Service created and started."
-            else
-              echo "Service already exists. Restarting to apply code changes..."
-              sudo systemctl restart myproject.service
-            fi
+            echo "$SERVICE_CONTENT" | sudo tee $SERVICE_FILE > /dev/null
+            
+            sudo systemctl daemon-reload
+            sudo systemctl enable myproject.service
+            sudo systemctl restart myproject.service
           EOF
 
-      - name: Configure Nginx on EC2
+      - name: Build and Copy Frontend
         run: |
+          cd client
+          npm install
+          CI=false npm run build
+          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -r build/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/frontend_build
+          
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-
-            if ! command -v nginx &> /dev/null; then
+            if ! id -u nginx >/dev/null 2>&1; then
                 sudo yum install -y nginx
                 sudo systemctl enable nginx
                 sudo systemctl start nginx
             fi
+            
+            sudo mkdir -p /var/www/react
+            sudo rm -rf /var/www/react/*
+            sudo cp -r ~/frontend_build/* /var/www/react/
+            rm -rf ~/frontend_build
+            sudo chown -R nginx:nginx /var/www/react
+          EOF
 
+      - name: Finalize Nginx Configuration
+        run: |
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             sudo cp /home/ec2-user/project/server/nginx.conf /etc/nginx/conf.d/grocery.conf
-
             sudo nginx -t && sudo systemctl restart nginx
-            echo "Nginx configured and restarted successfully."
           EOF
