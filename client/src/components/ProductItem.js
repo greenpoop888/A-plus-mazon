@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Image, Label, Icon } from 'semantic-ui-react';
+import { Card, Image, Icon } from 'semantic-ui-react';
 
 const ProductItem = ({ product, stock }) => {
     const renderStockUI = () => {
