@@ -21,6 +21,7 @@ class ProductDAO:
         secondary_category: Optional[int] = None,
         tertiary_category: Optional[int] = None
     ) -> List[Dict[str, Any]]:
+    """Retrieve products for a given store with optional category filters."""
         statement = (
             select(
                 Product,
@@ -67,6 +68,7 @@ class ProductDAO:
 
 
     def get_quantities(self, store_id: int, product_ids: List[int]) -> List[dict]:
+        """Retrieve product quantities for a given store and list of product IDs."""
         statement = select(ProductInStore).where(
             (ProductInStore.store_id == store_id) &
             (ProductInStore.product_id.in_(product_ids))

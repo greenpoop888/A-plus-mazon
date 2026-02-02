@@ -16,6 +16,7 @@ class ProductController:
         secondary_category: Optional[str] = None,
         tertiary_category: Optional[str] = None
     ) -> List[dict]:
+    """Retrieve products for a given store with optional category filters."""
         try:
             return self.product_dao.get_products(
                 store_id,
@@ -31,6 +32,7 @@ class ProductController:
         store_id: int,
         product_ids: List[int]
     ) -> List[dict]:
+    """Retrieve product quantities for a given store and list of product IDs."""
         try:
             return self.product_dao.get_quantities(store_id, product_ids)
         except Exception as e:

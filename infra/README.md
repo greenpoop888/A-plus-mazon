@@ -8,6 +8,7 @@ Using Terraform for AWS infrastructure set up.
 - **S3 Bucket**: Stores produc images for public access
 - **Security Group**: Allows HTTP (port 80) for web portal, HTTP (port 8000) for backend api development and SSH (port 22) access
 - **Elastic IP**: Set up fixed public IP, associated EC2 instance with it for permanent public IP address.
+- **RDS**: Set up a RDS with postgre18.1 for permenent data storage.
 
 ## Prerequisites
 
@@ -54,3 +55,4 @@ After applying, Terraform will output:
 - EC2 instance ID and public IP/DNS
 - S3 bucket ID, name, domain name and arn
 - Elastic IP for EC2
+- RDS with postgres
