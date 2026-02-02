@@ -3,7 +3,9 @@ Using python3.11 and FastAPI for backend api system.
 
 ## Feature
  - Read Categories
- - Read Products (with optional categories filter)
+ - Read Stores
+ - Read Products (with store_id and optional categories filter)
+ - Read quantities (with store_id and product_ids)
 
 ## Setup
 1. install dependencies:
@@ -20,13 +22,34 @@ The service will be available at `http://localhost:8000`
 
 
 ## API Documentation
-
-Once the service is running, visit:
+Once the service is running, visit for more documentation and endpoints test:
 - Swagger UI: `http://localhost:8000/docs`
 
-## Seed data set up
+1. GET /api/products - Get products in store
+     parameter:
+        - store_id(int): required
+        - primary_category(int): optional
+        - secondary_category(int): optional
+        - tertiary_category(int): optional
+        example request url: "http://127.0.0.1:8000/api/products?store_id=1&primary_category=1&secondary_category=1&tertiary_category=1"
+2. GET /api/quantities - Get Quantities for products in store
+    parameter:
+        - store_id(int): required
+        - product_ids(string): required, e.g. "1,2,3"
+        example request url: "http://127.0.0.1:8000/api/quantities?store_id=1&product_ids=1%2C2"
+3. GET /api/categories - Get Categories
+    no parameter required
+    example request url: "http://127.0.0.1:8000/api/categories"
+4. GET /api/stores - Get Stores
+    no parameter required
+    example request url: "http://127.0.0.1:8000/api/stores"
+
+
+## Seed data set up (if you install postgre 18.1 locally)
+please make your own .env under server folder, content should include "DATABASE_URL=[your postgres connection string]"
+
+then run followind command for seed data setup:
 ```bash
-cd server
 python -m src.seeds.database
 python -m src.seeds.seed_data
 ```

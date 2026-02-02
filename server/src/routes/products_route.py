@@ -11,9 +11,9 @@ router = APIRouter()
 async def get_products(
     session: Session = Depends(get_session),
     store_id: int = Query(..., description="Store ID to filter products"),
-    primary_category: Optional[str] = Query(None, description="Filter by primary category ID"),
-    secondary_category: Optional[str] = Query(None, description="Filter by secondary category ID"),
-    tertiary_category: Optional[str] = Query(None, description="Filter by tertiary category ID")
+    primary_category: Optional[int] = Query(None, description="Filter by primary category ID"),
+    secondary_category: Optional[int] = Query(None, description="Filter by secondary category ID"),
+    tertiary_category: Optional[int] = Query(None, description="Filter by tertiary category ID")
 ):
     """
     Retrieve a list of products with optional filtering by category.

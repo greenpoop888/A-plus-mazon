@@ -21,7 +21,7 @@ class ProductDAO:
         secondary_category: Optional[int] = None,
         tertiary_category: Optional[int] = None
     ) -> List[Dict[str, Any]]:
-    """Retrieve products for a given store with optional category filters."""
+        """Retrieve products for a given store with optional category filters."""
         statement = (
             select(
                 Product,
