@@ -44,3 +44,15 @@ variable "db_password" {
   type      = string
   sensitive = true
 }
+
+variable "apigateway_name" {
+  description = "Api gateway name"
+  type      = string
+  default   = "InventoryAPI"
+}
+
+variable "apigateway_apikey_name" {
+  description = "Api gateway api key"
+  type      = string
+  default   = "ClientApiKey"
+}

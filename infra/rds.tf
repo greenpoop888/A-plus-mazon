@@ -6,7 +6,14 @@ resource "aws_security_group" "rds_sg" {
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.lambda_sg.id]
+  }
+
+  ingress {
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [aws_security_group.app_sg.id] 
   }
 
   egress {
@@ -18,7 +25,7 @@ resource "aws_security_group" "rds_sg" {
 }
 
 resource "aws_db_subnet_group" "main" {
-  name       = "ecommerce-db-subnet-group"
+  name       = "ecommerce-db-subnet-group-${random_id.id.hex}"
   subnet_ids = data.aws_subnets.default.ids
 }
 
