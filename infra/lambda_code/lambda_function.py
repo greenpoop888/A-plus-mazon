@@ -3,74 +3,115 @@ import json
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
+def get_db_connection():
+    return psycopg2.connect(
+        host=os.environ['DB_HOST'],
+        database=os.environ['DB_NAME'],
+        user=os.environ['DB_USER'],
+        password=os.environ['DB_PASSWORD'],
+        connect_timeout=5
+    )
+
 def lambda_handler(event, context):
-    # 1. 從環境變數讀取資料庫連線資訊 (在 Terraform 中定義的)
-    db_host = os.environ.get('DB_HOST')
-    db_name = os.environ.get('DB_NAME')
-    db_user = os.environ.get('DB_USER')
-    db_pass = os.environ.get('DB_PASSWORD')
-
-    # 2. 建立資料庫連線
-    try:
-        conn = psycopg2.connect(
-            host=db_host,
-            database=db_name,
-            user=db_user,
-            password=db_pass,
-            connect_timeout=5
-        )
-        # 使用 RealDictCursor 可以直接把查詢結果轉成字典格式
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-    except Exception as e:
-        return {
-            'statusCode': 500,
-            'body': json.dumps({'error': f"Database connection failed: {str(e)}"})
-        }
-
-    # 3. 解析來自 API Gateway 的參數
-    # 假設路徑是 /inventory?storeId=1&productId=101&minAmount=5
+    path = event.get('path', '')
+    method = event.get('httpMethod', '')
     query_params = event.get('queryStringParameters') or {}
-    store_id = query_params.get('storeId')
-    product_id = query_params.get('productId')
-    min_amount = int(query_params.get('minAmount', 0))
+    
+    body = {}
+    if event.get('body'):
+        try:
+            body = json.loads(event['body'])
+        except:
+            pass
 
     try:
-        # 4. 執行查詢
-        # 注意：這裡的 Table Name 和 Column Name 請根據你實際的資料庫修改
-        query = """
-            SELECT quantity 
-            FROM inventory 
-            WHERE store_id = %s AND product_id = %s;
-        """
-        cur.execute(query, (store_id, product_id))
-        result = cur.fetchone()
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
 
-        if result:
-            actual_qty = result['quantity']
-            # 判斷是否達到要求的最小數量 (minAmount)
-            has_enough = actual_qty >= min_amount
+        # --- Endpoint 1: GET /inventory ---
+        if path == "/inventory" and method == "GET":
+            pid = query_params.get('product_id')
+            sid = query_params.get('store_id')
+            min_amt = int(query_params.get('min_amount', 0))
             
-            response_body = {
-                'storeId': store_id,
-                'productId': product_id,
-                'currentInventory': actual_qty,
-                'hasMinAmount': has_enough
-            }
-            status_code = 200
+            cur.execute("SELECT quantity FROM productinstore WHERE store_id = %s AND product_id = %s", (sid, pid))
+            res = cur.fetchone()
+            if res:
+                return response(200, {"hasStock": res['quantity'] >= min_amt, "current": res['quantity']})
+            return response(404, {"error": "Not found"})
+
+        # --- Endpoint 2: GET /price ---
+        elif path == "/price" and method == "GET":
+            pid = query_params.get('product_id')
+            sid = query_params.get('store_id')
+            
+            cur.execute("""SELECT p.price, p.on_sale AS p_on_sale, p.sale_rate AS p_sale_rate,
+                            pis.quantity, pl.on_sale AS pl_on_sale, pl.sale_rate AS pl_sale_rate
+                            FROM product AS p
+                            JOIN productinstore AS pis ON p.id = pis.product_id
+                            JOIN productline AS pl ON p.product_line_id = pl.id
+                            WHERE p.id = %s AND pis.store_id = %s""", (pid, sid))
+            res = cur.fetchone()
+            if res:
+                if res['quantity'] <= 0:
+                    return response(400, {"error": "Out of stock"})
+                else:
+                    if res['p_on_sale'] or res['pl_on_sale']:
+                        final_sale = res['p_sale_rate'] if res['p_on_sale'] else 0
+                        final_sale = max(final_sale, res['pl_sale_rate'] if res['pl_on_sale'] else 0)
+                final_price = res['price'] * final_sale
+                return response(200, {"productId": pid, "price": max(0, final_price)})
+            return response(404, {"error": "Product not found"})
+
+        # --- Endpoint 3: POST /deduct ---
+        elif path == "/deduct" and method == "POST":
+            pid, sid, qty = body.get('product_id'), body.get('store_id'), body.get('quantity', 0)
+           
+            cur.execute("""
+                UPDATE productinstore SET quantity = quantity - %s 
+                WHERE store_id = %s AND product_id = %s AND quantity >= %s
+                RETURNING quantity
+            """, (qty, sid, pid, qty))
+            
+            res = cur.fetchone()
+            if res:
+                conn.commit()
+                return response(200, {"status": "success", "newQuantity": res['quantity']})
+            return response(400, {"error": "Insufficient inventory or product not found"})
+
+        # --- Endpoint 4: POST /deduct-batch  ---
+        elif path == "/deduct-batch" and method == "POST":
+            sid = body.get('store_id')
+            items = body.get('items', []) # format: [{"product_id": 1, "quantity": 2}, ...]
+            
+            try:
+                cur.execute("BEGIN;")
+                for item in items:
+                    cur.execute("""
+                        UPDATE productinstore SET quantity = quantity - %s 
+                        WHERE store_id = %s AND product_id = %s AND quantity >= %s
+                    """, (item['qty'], sid, item['product_id'], item['quantity']))
+                    
+                    if cur.rowcount == 0:
+                        raise Exception(f"Item {item['product_id']} insufficient stock")
+                
+                conn.commit()
+                return response(200, {"status": "batch success"})
+            except Exception as e:
+                conn.rollback()
+                return response(400, {"error": str(e)})
+
         else:
-            response_body = {'error': 'Product or Store not found'}
-            status_code = 404
+            return response(404, {"error": "Route not found"})
 
     except Exception as e:
-        response_body = {'error': str(e)}
-        status_code = 500
+        return response(500, {"error": str(e)})
     finally:
-        # 5. 關閉連線
-        cur.close()
-        conn.close()
+        if 'conn' in locals(): conn.close()
 
+def response(status_code, data):
     return {
         'statusCode': status_code,
         'headers': {'Content-Type': 'application/json'},
-        'body': json.dumps(response_body)
+        'body': json.dumps(data)
     }
