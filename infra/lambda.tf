@@ -1,14 +1,11 @@
-# 1. 獲取目前帳號資訊
 data "aws_caller_identity" "current" {}
 
-# 2. 打包程式碼
 data "archive_file" "lambda_zip" {
   type        = "zip"
   source_dir  = "${path.module}/lambda_code"
-  output_path = "${path.module}/lambda_function.zip"
+  output_path = "${path.module}/lambda_function-${random_id.id.hex}.zip"
 }
 
-# 3. Lambda Security Group
 resource "aws_security_group" "lambda_sg" {
   name        = "inventory-lambda-sg-${random_id.id.hex}"
   description = "Security group for inventory lambda to access RDS"
@@ -26,7 +23,6 @@ resource "aws_security_group" "lambda_sg" {
   }
 }
 
-# 4. Lambda 函數定義
 resource "aws_lambda_function" "inventory_api" {
   filename         = data.archive_file.lambda_zip.output_path
   function_name    = "InventoryService"

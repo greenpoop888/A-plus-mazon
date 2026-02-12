@@ -39,3 +39,7 @@ output "eip_ip" {
 output "rds_endpoint" {
   value = aws_db_instance.postgres.endpoint
 }
+
+output "api_base_url" {
+  value = aws_api_gateway_stage.prod.invoke_url
+}
