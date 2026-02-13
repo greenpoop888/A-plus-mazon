@@ -44,7 +44,7 @@ def call_api(method, url, headers, params=None, json_data=None):
         else:
             res = requests.post(url, headers=headers, json=json_data)
         
-        print(f"{method} {url} -> {res.status_code}")
+        print(f"{method} {url}: {params if params else json_data} -> {res.status_code}")
         print(f"Response: {res.text}")
         return res
     except Exception as e:
@@ -67,7 +67,7 @@ def main():
     for pid in ["1", "2"]:
         # Inventory
         call_api("GET", f"{base_url}/inventory", headers, 
-                 params={"store_id": "1", "product_id": pid, "min_amount": 1})
+                 params={"store_id": "1", "product_id": pid, "min_amount": 30})
         # Price
         call_api("GET", f"{base_url}/price", headers, 
                  params={"store_id": "1", "product_id": pid})
@@ -108,7 +108,16 @@ def main():
     call_api("POST", f"{base_url}/deduct-batch", headers, json_data=batch2)
 
     # ---------------------------------------------------------
-    # 4. Error Handling
+    # 4. Quantity Check after deductions
+    # ---------------------------------------------------------
+    print(f"\n{'='*30}\n[TEST] Inventory & Price (ID 1, 2)\n{'='*30}")
+    for pid in ["1", "2", "3", "4"]:
+        # Inventory
+        call_api("GET", f"{base_url}/inventory", headers, 
+                 params={"store_id": "1", "product_id": pid, "min_amount": 1})
+
+    # ---------------------------------------------------------
+    # 5. Error Handling
     # ---------------------------------------------------------
     print(f"\n{'='*30}\n[TEST] Error Handling Case\n{'='*30}")
     

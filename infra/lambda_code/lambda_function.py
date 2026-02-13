@@ -58,7 +58,7 @@ def lambda_handler(event, context):
                 else:
                     if res['p_on_sale'] or res['pl_on_sale']:
                         final_sale = res['p_sale_rate'] if res['p_on_sale'] else 0
-                        final_sale = max(final_sale, res['pl_sale_rate'] if res['pl_on_sale'] else 0)
+                        final_sale = min(final_sale, res['pl_sale_rate'] if res['pl_on_sale'] else 0)
                 final_price = res['price'] * final_sale
                 return response(200, {"productId": pid, "price": max(0, final_price)})
             return response(404, {"error": "Product not found"})
