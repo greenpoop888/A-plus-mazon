@@ -90,7 +90,7 @@ def lambda_handler(event, context):
                     cur.execute("""
                         UPDATE productinstore SET quantity = quantity - %s 
                         WHERE store_id = %s AND product_id = %s AND quantity >= %s
-                    """, (item['qty'], sid, item['product_id'], item['quantity']))
+                    """, (item['quantity'], sid, item['product_id'], item['quantity']))
                     
                     if cur.rowcount == 0:
                         raise Exception(f"Item {item['product_id']} insufficient stock")
