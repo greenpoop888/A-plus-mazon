@@ -18,42 +18,28 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 20
 
+      - name: Transfer Server Code via SCP
+        run: |
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "mkdir -p /home/ec2-user/project/server"
+          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -r ./server/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ec2-user/project/server/
+
       - name: Deploy Backend and Environment
         run: |
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             set -e
-            
-            mkdir -p ~/.ssh
-            ssh-keyscan -H github.com >> ~/.ssh/known_hosts
-
-            if ! command -v git &> /dev/null; then
-                sudo yum install -y git
-            fi
-
             if ! command -v python3.11 &> /dev/null; then
                 sudo yum update -y
                 sudo yum install -y python3.11 python3.11-devel python3.11-pip
             fi
 
-            PROJECT_ROOT="/home/ec2-user/project"
-            mkdir -p "$PROJECT_ROOT"
-
-            if [ ! -d "$PROJECT_ROOT/.git" ]; then
-                git clone -b second_assignment git@github.com:seattle-university-cs-cloud-computing/homework-series-xinrou-xiao.git "$PROJECT_ROOT"
-            else
-                cd "$PROJECT_ROOT"
-                git fetch --all
-                git reset --hard origin/second_assignment
-            fi
-
-            cd "$PROJECT_ROOT/server"
+            PROJECT_ROOT="/home/ec2-user/project/server"
+            cd "$PROJECT_ROOT"
             echo "DATABASE_URL=${{ secrets.DB_URL }}" > .env
 
             if [ ! -d "venv" ]; then
