@@ -56,3 +56,5 @@ After applying, Terraform will output:
 - S3 bucket ID, name, domain name and arn
 - Elastic IP for EC2
 - RDS with postgres
+- API router for POS system
+- Lambda for POS api

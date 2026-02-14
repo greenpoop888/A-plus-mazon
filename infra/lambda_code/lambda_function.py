@@ -52,15 +52,25 @@ def lambda_handler(event, context):
                             JOIN productline AS pl ON p.product_line_id = pl.id
                             WHERE p.id = %s AND pis.store_id = %s""", (pid, sid))
             res = cur.fetchone()
+            
             if res:
                 if res['quantity'] <= 0:
                     return response(400, {"error": "Out of stock"})
-                else:
-                    if res['p_on_sale'] or res['pl_on_sale']:
-                        final_sale = res['p_sale_rate'] if res['p_on_sale'] else 0
-                        final_sale = min(final_sale, res['pl_sale_rate'] if res['pl_on_sale'] else 0)
-                final_price = res['price'] * final_sale
-                return response(200, {"productId": pid, "price": max(0, final_price)})
+                
+                final_sale = 1.0
+                
+                if res['p_on_sale'] or res['pl_on_sale']:
+                    p_rate = res['p_sale_rate'] if res['p_on_sale'] else 1.0
+                    pl_rate = res['pl_sale_rate'] if res['pl_on_sale'] else 1.0
+                    final_sale = min(p_rate, pl_rate)
+                
+                final_price = round(float(res['price']) * float(final_sale), 2)
+                
+                return response(200, {
+                    "productId": pid, 
+                    "price": max(0.0, final_price)
+                })
+            
             return response(404, {"error": "Product not found"})
 
         # --- Endpoint 3: POST /deduct ---
@@ -83,20 +93,33 @@ def lambda_handler(event, context):
         elif path == "/deduct-batch" and method == "POST":
             sid = body.get('store_id')
             items = body.get('items', []) # format: [{"product_id": 1, "quantity": 2}, ...]
-            
+            results = [] 
+
             try:
                 cur.execute("BEGIN;")
                 for item in items:
                     cur.execute("""
-                        UPDATE productinstore SET quantity = quantity - %s 
+                        UPDATE productinstore 
+                        SET quantity = quantity - %s 
                         WHERE store_id = %s AND product_id = %s AND quantity >= %s
+                        RETURNING quantity
                     """, (item['quantity'], sid, item['product_id'], item['quantity']))
                     
-                    if cur.rowcount == 0:
-                        raise Exception(f"Item {item['product_id']} insufficient stock")
+                    row = cur.fetchone()
+                    
+                    if row:
+                        results.append({
+                            "product_id": item['product_id'],
+                            "new_quantity": row['quantity']
+                        })
+                    else:
+                        raise Exception(f"Item {item['product_id']} insufficient stock or not found")
                 
                 conn.commit()
-                return response(200, {"status": "batch success"})
+                return response(200, {
+                    "status": "batch success",
+                    "updated_items": results
+                })
             except Exception as e:
                 conn.rollback()
                 return response(400, {"error": str(e)})

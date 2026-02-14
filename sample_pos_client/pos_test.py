@@ -85,7 +85,7 @@ def main():
     # ---------------------------------------------------------
     print(f"\n{'='*30}\n[TEST] Deduct Batch\n{'='*30}")
     
-    # First batch: ID 1 & 2
+    # First batch: ID 1 & 2 (should return 200)
     print("--- Batch 1 (Product 1 & 2) ---")
     batch1 = {
         "store_id": "1",
@@ -96,7 +96,7 @@ def main():
     }
     call_api("POST", f"{base_url}/deduct-batch", headers, json_data=batch1)
 
-    # Second batch: ID 3 & 4
+    # Second batch: ID 3 & 4 (should return 400 due to insufficient stock)
     print("\n--- Batch 2 (Product 3 & 4) ---")
     batch2 = {
         "store_id": "1",
@@ -108,16 +108,7 @@ def main():
     call_api("POST", f"{base_url}/deduct-batch", headers, json_data=batch2)
 
     # ---------------------------------------------------------
-    # 4. Quantity Check after deductions
-    # ---------------------------------------------------------
-    print(f"\n{'='*30}\n[TEST] Inventory & Price (ID 1, 2)\n{'='*30}")
-    for pid in ["1", "2", "3", "4"]:
-        # Inventory
-        call_api("GET", f"{base_url}/inventory", headers, 
-                 params={"store_id": "1", "product_id": pid, "min_amount": 1})
-
-    # ---------------------------------------------------------
-    # 5. Error Handling
+    # 4. Error Handling
     # ---------------------------------------------------------
     print(f"\n{'='*30}\n[TEST] Error Handling Case\n{'='*30}")
     
