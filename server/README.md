@@ -2,7 +2,7 @@
 Using python3.11 and FastAPI for backend api system.
 
 ## Feature
- - Read Categories
+ - Read Categories 
  - Read Stores
  - Read Products (with store_id and optional categories filter)
  - Read quantities (with store_id and product_ids)
@@ -48,8 +48,27 @@ Once the service is running, visit for more documentation and endpoints test:
 ## Seed data set up (if you install postgre 18.1 locally)
 please make your own .env under server folder, content should include "DATABASE_URL=[your postgres connection string]"
 
-then run followind command for seed data setup:
+then run following command for seed data setup:
 ```bash
 python -m src.seeds.database
 python -m src.seeds.seed_data
 ```
+
+After the scripp, tables, indexes and seed data should be created.
+Should create indexes for following fields:
+* category:
+    - level
+    - parent_id
+* product:
+    - primary_category
+    - secondary_category
+    - thertiary_category
+* prodcutinstore:
+    - store_product (composite primary key)
+
+
+If you want to connect to RDS server, here is the steps:
+1. ssh -i <your_key.pem> ec2-user@<ec2_eip>
+2. sudo yum install postgresql15
+3. psql -h <your_RDS_Endpoint> -U dbadmin -d grocery
+4. \d <table_name>
