@@ -9,9 +9,9 @@ class Product(SQLModel, table=True):
     price: float
     image_url: str
     ingredients: List[str] = Field(sa_column=Column(ARRAY(String)))
-    primary_category_id: int = Field(foreign_key="category.id")
-    secondary_category_id: Optional[int] = Field(default=None, foreign_key="category.id")
-    tertiary_category_id: Optional[int] = Field(default=None, foreign_key="category.id")
+    primary_category_id: int = Field(foreign_key="category.id", index=True)
+    secondary_category_id: Optional[int] = Field(default=None, foreign_key="category.id", index=True)
+    tertiary_category_id: Optional[int] = Field(default=None, foreign_key="category.id", index=True)
     on_sale: bool
     sale_rate: Optional[float] = None
     product_line_id: Optional[int] = Field(default=None, foreign_key="productline.id")
