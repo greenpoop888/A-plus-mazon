@@ -3,7 +3,7 @@ import { Dropdown } from 'semantic-ui-react';
 import { getStores } from '../services/api';
 
 
-const Stories = ({ store, onStoreChange }) => {
+const Stories = ({ store, onStoreChange, onStoresLoad }) => {
     const [stores, setStores] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -18,6 +18,8 @@ const Stories = ({ store, onStoreChange }) => {
                 }));
                 setStores(transformed);
 
+                if (onStoresLoad) onStoresLoad(transformed);
+
                 if (transformed.length > 0 && !store) {
                     onStoreChange(transformed[0].value);
                 }
@@ -28,7 +30,6 @@ const Stories = ({ store, onStoreChange }) => {
             }
         };
         fetchStoresData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleDropdownChange = (e, { value }) => {

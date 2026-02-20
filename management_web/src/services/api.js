@@ -75,47 +75,26 @@ export async function getStores() {
     return apiRequest('/stores');
 }
 
-/**
- * Get all categories in hierarchical structure
- * @returns {Promise<Array>} Array of categories with nested subcategories
- */
-export async function getCategories() {
-    return apiRequest('/categories');
+export async function getUnofferedProducts(storeId) {
+    const params = new URLSearchParams();
+    params.append('store_id', storeId);
+
+    const endpoint = `/unoffered-products?${params.toString()}`;
+    return apiRequest(endpoint);
 }
 
-/**
- * Get products by primary category only
- * @param {string} primaryCategory - Primary category ID
- * @returns {Promise<Array>} Array of products
- */
-export async function getProductsByPrimaryCategory(primaryCategory) {
-    return getProducts({ primary_category: primaryCategory });
-}
-
-/**
- * Get products by primary and secondary categories
- * @param {string} primaryCategory - Primary category ID
- * @param {string} secondaryCategory - Secondary category ID
- * @returns {Promise<Array>} Array of products
- */
-export async function getProductsBySecondaryCategory(primaryCategory, secondaryCategory) {
-    return getProducts({
-        primary_category: primaryCategory,
-        secondary_category: secondaryCategory
+export async function offerProducts(storeId, newOffer) {
+    return apiRequest('/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ store_id: storeId, new_offer: newOffer }),
     });
 }
 
-/**
- * Get products by all three category levels
- * @param {string} primaryCategory - Primary category ID
- * @param {string} secondaryCategory - Secondary category ID
- * @param {string} tertiaryCategory - Tertiary category ID
- * @returns {Promise<Array>} Array of products
- */
-export async function getProductsByTertiaryCategory(primaryCategory, secondaryCategory, tertiaryCategory) {
-    return getProducts({
-        primary_category: primaryCategory,
-        secondary_category: secondaryCategory,
-        tertiary_category: tertiaryCategory
+export async function unofferProducts(storeId, productIds) {
+    return apiRequest('/products', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ store_id: storeId, product_ids: productIds }),
     });
 }

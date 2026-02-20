@@ -15,10 +15,10 @@ pip install -r requirements.txt
 
 2. Run the service:
 ```bash
-uvicorn main:app --host 127.0.0.1 --port 8001
+uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 
-The service will be available at `http://localhost:8001`
+The service will be available at `http://localhost:8000`
 
 
 ## API Documentation
