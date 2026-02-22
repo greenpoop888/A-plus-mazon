@@ -71,7 +71,7 @@ async def update_quantities(
         
         result = controller.update_product_quantities(
             store_id=store_id,
-            items=update_items
+            update_items=update_items
         )
         
         return {"status": "success", "updated_items_count": len(update_items)}

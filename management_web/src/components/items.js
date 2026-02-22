@@ -3,7 +3,15 @@ import { Table, Loader } from 'semantic-ui-react';
 import { getProducts, getQuantities } from '../services/api';
 import ProductItem from './product_item';
 
-const Items = ({ store, selectedIds, onSelectionChange, isEditMode, tempQuantities, onQtyMapChange }) => {
+const Items = ({
+    store,
+    selectedIds,
+    onSelectionChange,
+    isEditMode,
+    tempQuantities,
+    onQtyMapChange,
+    onOriginalStocksLoad
+}) => {
     const [products, setProducts] = useState([]);
     const [stocks, setStocks] = useState({});
     const [loading, setLoading] = useState(true);
@@ -15,15 +23,26 @@ const Items = ({ store, selectedIds, onSelectionChange, isEditMode, tempQuantiti
             try {
                 const productData = await getProducts({ store });
                 setProducts(productData);
+
                 if (productData.length > 0) {
                     const stockData = await getQuantities(store, productData.map(p => p.id));
                     const stockMap = {};
-                    stockData.forEach(item => { stockMap[item.product_id] = item.quantity; });
+                    stockData.forEach(item => {
+                        stockMap[item.product_id] = item.quantity;
+                    });
+
                     setStocks(stockMap);
                     onQtyMapChange(stockMap);
+
+                    if (onOriginalStocksLoad) {
+                        onOriginalStocksLoad(stockMap);
+                    }
                 }
-            } catch (err) { console.error(err); }
-            finally { setLoading(false); }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
         };
         fetchData();
     }, [store]);

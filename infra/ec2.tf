@@ -1,4 +1,4 @@
-resource "aws_instance" "app_server" {
+resource "aws_instance" "client_server" {
   ami           = var.ec2_ami_id
   instance_type = var.ec2_instance_type
   key_name      = var.ec2_key_name
@@ -9,6 +9,26 @@ resource "aws_instance" "app_server" {
 
   tags = {
     Name = "${var.ec2_instance_name}-${random_id.id.hex}"
+  }
+
+  user_data = <<-EOF
+              #!/bin/bash
+              dnf update -y
+              dnf install -y python3
+              EOF
+}
+
+resource "aws_instance" "management_server" {
+  ami           = var.ec2_ami_id
+  instance_type = var.ec2_instance_type
+  key_name      = var.ec2_key_name
+
+  vpc_security_group_ids = [
+    aws_security_group.app_sg.id
+  ]
+
+  tags = {
+    Name = "${var.management_site_ec2_name}-${random_id.id.hex}"
   }
 
   user_data = <<-EOF

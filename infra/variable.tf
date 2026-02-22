@@ -7,7 +7,7 @@ variable "ec2_ami_id" {
 variable "ec2_instance_name" {
   description = "Value of the EC2 instance's Name tag."
   type        = string
-  default     = "product-service"
+  default     = "grocery_client_site"
 }
 
 variable "ec2_instance_type" {
@@ -49,4 +49,10 @@ variable "apigateway_name" {
   description = "Api gateway name"
   type      = string
   default   = "InventoryAPI"
+}
+
+variable "management_site_ec2_name" {
+  description = "Grorcery inventory management site"
+  type        = string
+  default     = "inventory_management_ec2"
 }

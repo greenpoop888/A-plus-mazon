@@ -86,7 +86,6 @@ export async function getUnofferedProducts(storeId) {
 export async function offerProducts(storeId, newOffer) {
     return apiRequest('/products', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ store_id: storeId, new_offer: newOffer }),
     });
 }
@@ -94,7 +93,14 @@ export async function offerProducts(storeId, newOffer) {
 export async function unofferProducts(storeId, productIds) {
     return apiRequest('/products', {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ store_id: storeId, product_ids: productIds }),
+    });
+}
+
+
+export async function updateQuantity(storeId, update_items) {
+    return apiRequest('/quantities', {
+        method: 'PUT',
+        body: JSON.stringify({ store_id: storeId, update_items }),
     });
 }

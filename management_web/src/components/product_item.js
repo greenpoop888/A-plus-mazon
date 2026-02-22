@@ -9,6 +9,7 @@ const ProductItemRow = ({ product, stock, isSelected, onSelect, isEditMode, edit
                     type="number"
                     size="mini"
                     style={{ width: '80px' }}
+                    min={0}
                     value={editedQty !== undefined ? editedQty : (stock || 0)}
                     onChange={(e) => onQtyChange(product.id, Number(e.target.value))}
                 />

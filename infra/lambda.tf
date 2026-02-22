@@ -25,7 +25,7 @@ resource "aws_security_group" "lambda_sg" {
 
 resource "aws_lambda_function" "inventory_api" {
   filename         = data.archive_file.lambda_zip.output_path
-  function_name    = "InventoryService"
+  function_name    = "InventoryService-${random_id.id.hex}"
   
   role             = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/LabRole"
   

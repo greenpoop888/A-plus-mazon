@@ -3,7 +3,7 @@ import { Container, Header, Label, Segment, Grid, Button, Confirm } from 'semant
 import Items from '../components/items';
 import Stories from '../components/store_selection';
 import OfferModal from '../components/offer_item';
-import { unofferProducts } from '../services/api';
+import { unofferProducts, updateQuantity } from '../services/api';
 
 const Home = () => {
     const [store, setStore] = useState('');
@@ -16,34 +16,49 @@ const Home = () => {
     const [isEditMode, setIsEditMode] = useState(false);
     const [tempQuantities, setTempQuantities] = useState({});
     const [saveConfirmOpen, setSaveConfirmOpen] = useState(false);
+    const [originalStocks, setOriginalStocks] = useState({});
 
     const handleSaveAllClick = () => {
         setSaveConfirmOpen(true);
     };
 
     const confirmBulkUpdate = async () => {
+        const hasNegative = Object.values(tempQuantities).some(qty => qty < 0);
+
+        if (hasNegative) {
+            alert("Quantity cannot be negative! Please check your inputs.");
+            return;
+        }
+
         setSaveConfirmOpen(false);
-        const updates = Object.keys(tempQuantities).map(id => ({
-            product_id: Number(id),
-            quantity: Number(tempQuantities[id])
-        }));
+
+        const updates = Object.keys(tempQuantities)
+            .filter(id => {
+                const productId = Number(id);
+                return tempQuantities[id] !== originalStocks[productId];
+            })
+            .map(id => ({
+                product_id: Number(id),
+                quantity: Number(tempQuantities[id])
+            }));
+
+        if (updates.length === 0) {
+            alert("No changes detected.");
+            setIsEditMode(false);
+            return;
+        }
 
         try {
-            const response = await fetch('/api/products/bulk-update', { // 假設你的路徑
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    store_id: Number(store),
-                    updates: updates
-                })
-            });
+            const response = await updateQuantity(Number(store), updates);
 
-            if (response.ok) {
+            if (response) {
                 setIsEditMode(false);
                 setRefreshKey(prev => prev + 1);
-                alert("All quantities updated!");
+                alert(`Updated ${updates.length} item(s) successfully!`);
             }
-        } catch (err) { console.error(err); }
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     const handleUnofferClick = () => {
@@ -53,16 +68,9 @@ const Home = () => {
 
     const handleConfirmUnoffer = async () => {
         try {
-            const response = await fetch('/api/products', {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    store_id: Number(store),
-                    product_ids: selectedIds
-                })
-            });
+            const response = await unofferProducts(Number(store), selectedIds);
 
-            if (response.ok) {
+            if (response) {
                 setConfirmOpen(false);
                 setSelectedIds([]);
                 setRefreshKey(prev => prev + 1);
@@ -86,9 +94,9 @@ const Home = () => {
                 <Grid verticalAlign='middle'>
                     <Grid.Row>
                         <Grid.Column width={10}>
-                            <Header as='h1'><Label size='massive' color='orange'>A+mazon⟷ Management site</Label></Header>
+                            <Header as='h1'><Label size='massive' color='orange'>A+mazon⟷ Management Portal</Label></Header>
                         </Grid.Column>
-                        <Grid.Column width={6}>
+                        <Grid.Column width={6} textAlign='right'>
                             <Stories
                                 store={store}
                                 onStoreChange={setStore}
@@ -125,14 +133,15 @@ const Home = () => {
                 isEditMode={isEditMode}
                 tempQuantities={tempQuantities}
                 onQtyMapChange={setTempQuantities}
+                onOriginalStocksLoad={setOriginalStocks}
                 selectedIds={selectedIds}
                 onSelectionChange={setSelectedIds}
             />
 
             <Confirm
                 open={saveConfirmOpen}
-                header="Confirm Bulk Update"
-                content="Are you sure you want to update quantities for ALL products in this list?"
+                header="Confirm Update"
+                content="Are you sure you want to update quantities for products in this list?"
                 onCancel={() => setSaveConfirmOpen(false)}
                 onConfirm={confirmBulkUpdate}
             />
