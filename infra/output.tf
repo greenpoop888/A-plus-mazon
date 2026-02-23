@@ -3,7 +3,7 @@ output "client_ec2_id" {
   value       = aws_instance.client_server.id
 }
 
-output "client_ec2_public_ip" {
+output "client_ec2_ip" {
   description = "Public IP address of the EC2 instance"
   value       = aws_instance.client_server.public_ip
 }
@@ -47,7 +47,7 @@ output "api_base_url" {
 }
 
 output "management_ec2_ip" {
-  value = aws_instance.management_server
+  value = aws_instance.management_server.public_ip
 }
 
 output "user_pool_id" {

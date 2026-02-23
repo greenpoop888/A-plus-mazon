@@ -4,12 +4,14 @@ from ..models.product import Product
 from ..controllers.product_controller import ProductController
 from ..database.database import get_session
 from sqlmodel import Session
+from ..auth.auth import get_current_user
 
 router = APIRouter()
 
 @router.get("/api/products")
 async def get_products(
     session: Session = Depends(get_session),
+    current_user: dict = Depends(get_current_user),
     store_id: int = Query(..., description="Store ID to filter products")
 ):
     """
@@ -29,6 +31,7 @@ async def get_products(
 @router.get("/api/quantities")
 async def get_quantities(
     session: Session = Depends(get_session),
+    current_user: dict = Depends(get_current_user),
     store_id: int = Query(..., description="Store ID to filter products"),
     product_ids: str = Query(..., description="List of product IDs to get quantities for")
 ):
@@ -51,6 +54,7 @@ async def get_quantities(
 @router.put("/api/quantities")
 async def update_quantities(
     payload: Dict[str, Any] = Body(...),
+    current_user: dict = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
     """
@@ -84,6 +88,7 @@ async def update_quantities(
 @router.post("/api/products")
 async def create_product(
     payload: Dict[str, Any] = Body(...),
+    current_user: dict = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
     """
@@ -122,6 +127,7 @@ async def create_product(
 @router.delete("/api/products")
 async def delete_products_from_store(
     payload: Dict[str, Any] = Body(...),
+    current_user: dict = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
     """
@@ -153,6 +159,7 @@ async def delete_products_from_store(
 @router.get("/api/unoffered-products")
 async def get_unoffered_products(
     session: Session = Depends(get_session),
+    current_user: dict = Depends(get_current_user),
     store_id: int = Query(..., description="Store ID to filter unoffered products")
 ):
     """

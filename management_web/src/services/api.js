@@ -1,3 +1,5 @@
+import { fetchAuthSession } from 'aws-amplify/auth';
+
 // API service for communicating with the backend
 const API_BASE_URL = '/api';
 
@@ -6,9 +8,12 @@ const API_BASE_URL = '/api';
  */
 async function apiRequest(endpoint, options = {}) {
     try {
+        const session = await fetchAuthSession();
+        const token = session.tokens.idToken.toString();
         const response = await fetch(`${API_BASE_URL}${endpoint}`, {
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
                 ...options.headers,
             },
             ...options,

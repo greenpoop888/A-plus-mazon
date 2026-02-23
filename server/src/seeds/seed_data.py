@@ -9,6 +9,8 @@ from ..config.config import settings
 
 engine = create_engine(settings.DATABASE_URL)
 
+S3_BASE_URL = settings.S3_BUCKET_URL
+
 def clear_data():
     print("cleaning all data from database...")
     tables = [
@@ -26,24 +28,31 @@ def clear_data():
     print("all data cleared successfully!")
 
 def _load_dummy_data(filename) -> List[Dict[str, Any]]:
-        dummy_file_path = os.path.join(os.path.dirname(__file__), 'dummy', filename)
-        try:
-            with open(dummy_file_path, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except FileNotFoundError:
-            print(f"Warning: Dummy stores file not found at {dummy_file_path}")
-            return []
-        except json.JSONDecodeError as e:
-            print(f"Error parsing dummy stores data: {e}")
-            return []
+    dummy_file_path = os.path.join(os.path.dirname(__file__), 'dummy', filename)
+    try:
+        with open(dummy_file_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        print(f"Warning: Dummy file not found at {dummy_file_path}")
+        return []
+    except json.JSONDecodeError as e:
+        print(f"Error parsing dummy data: {e}")
+        return []
 
 def seed_from_json(filename, model):
     print(f"Seeding data for {model.__name__} from {filename}...")
     data = _load_dummy_data(filename)
+    
     with Session(engine) as session:
         for item in data:
-                new_model = model(**item)
-                session.add(new_model)
+            if model == Product and "image_url" in item:
+                if S3_BASE_URL:
+                    if not str(item["image_url"]).startswith("http"):
+                        filename_part = str(item["image_url"]).lstrip("/")
+                        item["image_url"] = f"{S3_BASE_URL}{filename_part}"
+            
+            new_model = model(**item)
+            session.add(new_model)
         
         session.commit()
         print(f"Seeding completed successfully for {model.__name__}.")

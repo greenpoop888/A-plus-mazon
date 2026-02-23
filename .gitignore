@@ -67,3 +67,5 @@ backup/*
 
 reminder.txt
 /infra/*.zip
+
+/.github/workflows/*

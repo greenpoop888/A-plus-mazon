@@ -1,7 +1,7 @@
 resource "aws_cognito_user_pool" "employee_pool" {
   name = "employee-user-pool-${random_id.id.hex}"
 
-  alias_attributes         = ["email"]
+  username_attributes         = ["email"]
   auto_verified_attributes = ["email"]
 
   admin_create_user_config {
@@ -10,10 +10,10 @@ resource "aws_cognito_user_pool" "employee_pool" {
 
   password_policy {
     minimum_length    = 8
-    require_lowercase = true
-    require_numbers   = true
-    require_symbols   = true
-    require_uppercase = true
+    require_lowercase = false
+    require_numbers   = false
+    require_symbols   = false
+    require_uppercase = false
   }
 
   verification_message_template {

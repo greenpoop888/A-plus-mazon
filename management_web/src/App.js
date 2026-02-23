@@ -3,7 +3,19 @@ import Home from './pages/index';
 import { Amplify } from 'aws-amplify';
 import { Authenticator, View, Heading, useTheme, ThemeProvider } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
-import { Header, Label } from 'semantic-ui-react';
+import { Header, Label, Button } from 'semantic-ui-react';
+
+Amplify.configure({
+  Auth: {
+    Cognito: {
+      userPoolId: process.env.REACT_APP_USER_POOL_ID,
+      userPoolClientId: process.env.REACT_APP_CLIENT_ID,
+      loginWith: {
+        email: true
+      }
+    }
+  }
+});
 
 const theme = {
   name: 'custom-theme',
@@ -100,9 +112,9 @@ function App() {
         >
           {({ signOut, user }) => (
             <main>
-              <div style={{ padding: '20px', textAlign: 'right' }}>
-                <span>User: {user.signInDetails?.loginId} </span>
-                <button onClick={signOut}>Sign Out</button>
+              <div style={{ textAlign: 'right' }}>
+                <Label>{user.signInDetails?.loginId} </Label>
+                <Button color='orange' inverted size='mini' onClick={signOut}>Sign Out</Button>
               </div>
               <Home />
             </main>

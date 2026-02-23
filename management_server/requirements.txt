@@ -4,3 +4,5 @@ sqlmodel
 python-dotenv
 psycopg2-binary
 pydantic-settings
+python-jose[cryptography]
+requests
