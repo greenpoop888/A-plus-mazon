@@ -1,9 +1,3 @@
-variable "ec2_ami_id" {
-  description = "EC2 ami id."
-  type        = string
-  default     = "ami-07ff62358b87c7116"
-}
-
 variable "ec2_instance_name" {
   description = "Value of the EC2 instance's Name tag."
   type        = string

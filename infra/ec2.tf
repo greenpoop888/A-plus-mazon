@@ -1,5 +1,5 @@
 resource "aws_instance" "client_server" {
-  ami           = var.ec2_ami_id
+  ami           = data.aws_ami.amazon_linux.id
   instance_type = var.ec2_instance_type
   key_name      = var.ec2_key_name
 
@@ -19,7 +19,7 @@ resource "aws_instance" "client_server" {
 }
 
 resource "aws_instance" "management_server" {
-  ami           = var.ec2_ami_id
+  ami           = data.aws_ami.amazon_linux.id
   instance_type = var.ec2_instance_type
   key_name      = var.ec2_key_name
 
