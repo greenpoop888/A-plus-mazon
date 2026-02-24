@@ -74,7 +74,7 @@ Cognito pool client id: `<user_pool_client_id>`
 Cognito pool id: `<user_pool_id>`
 
 Just a little tips, I am using Windows while developing, so I used Gitbash to run .sh file, you may consider to execute them with Gitbash too.
----
+
 To test the POS system, please follow the step:
 
 cd sample_pos_client
@@ -88,3 +88,4 @@ test /deduct-batch, first case is store_id = 1, product_id = 1 & 2, quantity = 1
 test /inventory for invalid store and product id
 test /deduct for Insufficient stock
 test /undefined_route for invalid api route
+
