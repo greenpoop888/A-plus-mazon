@@ -11,7 +11,7 @@ import {
     Loader,
     Message
 } from 'semantic-ui-react';
-import { getUnofferedProducts } from '../services/api';
+import { getUnofferedProducts, offerProducts } from '../services/api';
 
 const OfferModal = ({ store, isOpen, onClose, onRefresh }) => {
     const [products, setProducts] = useState([]);
@@ -63,16 +63,9 @@ const OfferModal = ({ store, isOpen, onClose, onRefresh }) => {
         }));
 
         try {
-            const response = await fetch('/api/products', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    store_id: Number(store),
-                    new_offer
-                })
-            });
+            const response = await offerProducts(store, new_offer);
 
-            if (response.ok) {
+            if (response) {
                 setShowSuccess(true);
                 setTimeout(() => {
                     setShowSuccess(false);

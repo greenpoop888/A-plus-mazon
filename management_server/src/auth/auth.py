@@ -2,12 +2,14 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt
 import requests
+from ..config.config import settings
 
 security = HTTPBearer()
 
-REGION = "us-east-1"
-USER_POOL_ID = "us-east-1_JcCDDv0zc"
-APP_CLIENT_ID = "7jljhq26k2ortatrvibieg4qtd"
+
+REGION = settings.REGION
+USER_POOL_ID = settings.COGNITO_USER_POOL_ID
+APP_CLIENT_ID = settings.COGNITO_CLIENT_ID
 JWKS_URL = f"https://cognito-idp.{REGION}.amazonaws.com/{USER_POOL_ID}/.well-known/jwks.json"
 
 def get_current_user(res: HTTPAuthorizationCredentials = Depends(security)):

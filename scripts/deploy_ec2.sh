@@ -13,6 +13,7 @@ S3_BUCKET_URL=$7
 DB_PASSWORD=$8
 SSH_KEY=$9
 FRONTEND_SRC_DIR=${10}
+AWS_REGION=${11}
 
 # Config constants
 EC2_USER="ec2-user"
@@ -44,9 +45,10 @@ DATABASE_URL=$DB_URL
 COGNITO_USER_POOL_ID=$USER_POOL_ID
 COGNITO_CLIENT_ID=$CLIENT_ID
 S3_BUCKET_URL=$S3_BUCKET_URL
+REGION=$AWS_REGION
 ENV_EOF
 
-    if [ ! -d "venv" ]; then python3.11 -m venv venv; fi
+    if [ ! -d "venv" ]; then python3 -m venv venv; fi
     source venv/bin/activate
     pip install --upgrade pip
     pip install -r requirements.txt

@@ -32,6 +32,7 @@ CLIENT_ID=$(terraform output -raw user_pool_client_id)
 S3_DOMAIN=$(terraform output -raw s3_bucket_domain_name)
 S3_BUCKET_NAME=$(terraform output -raw s3_bucket_name)
 MANAGEMENT_SITE_IP=$(terraform output -raw management_ec2_ip)
+AWS_REGION=$(terraform output -raw aws_region)
 
 # Shared Variables
 S3_BUCKET_URL="${S3_DOMAIN}/"
@@ -71,7 +72,8 @@ echo "--- STEP 6.1: Deploying Client Site ---"
     "$S3_BUCKET_URL" \
     "$DB_PASSWORD" \
     "$SSH_KEY" \
-    "$PROJECT_ROOT/client"
+    "$PROJECT_ROOT/client" \
+    "$AWS_REGION"
 
 echo "--- STEP 6.2: Running Database Seed (Run Once via Client Site) ---"
 ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "ec2-user@$CLIENT_SITE_IP" << EOF
@@ -92,6 +94,7 @@ echo "--- STEP 6.3: Deploying Management Site ---"
     "$S3_BUCKET_URL" \
     "$DB_PASSWORD" \
     "$SSH_KEY" \
-    "$PROJECT_ROOT/management_web"
+    "$PROJECT_ROOT/management_web" \
+    "$AWS_REGION"
 
 echo "--- ALL TASKS COMPLETE ---"
