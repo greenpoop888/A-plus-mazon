@@ -75,17 +75,26 @@ Cognito pool id: `<user_pool_id>`
 
 Just a little tips, I am using Windows while developing, so I used Gitbash to run .sh file, you may consider to execute them with Gitbash too.
 
-To test the POS system, please follow the step:
+- To test the POS system, please follow the step:
 
+```bash
 cd sample_pos_client
 pip install -r requirements.txt
 python python .\pos_test.py
+```
+
 you should be able to see the result through console with following expected result:
 
 test /inventory and /price with store_id = 1, product_id = 1 & 2, min_amount = 30.
+
 test /deduct with store_id = 1, product_id = 1 & 2, quantity = 1
+
 test /deduct-batch, first case is store_id = 1, product_id = 1 & 2, quantity = 1, second case is store_id = 1, product_id = 3 & 4, quantity = 1(should return error for insufficient stock)
+
 test /inventory for invalid store and product id
+
 test /deduct for Insufficient stock
+
 test /undefined_route for invalid api route
+
 
