@@ -123,7 +123,35 @@ def lambda_handler(event, context):
             except Exception as e:
                 conn.rollback()
                 return response(400, {"error": str(e)})
+            
+        elif path == "/inventory_need_restock" and method == "GET":
+            cur.execute("SELECT store_id, product_id FROM productinstore WHERE quantity <= 10")
+            res = cur.fetchall()
+            return response(200, res)
 
+        elif path == "/add" and method == "POST":
+            try:
+                body = json.loads(event.get('body', '[]'))
+                
+                # Transaction starts automatically with the connection
+                for item in body:
+                    sid = item.get('store_id')
+                    pid = item.get('product_id')
+                    amt = int(item.get('add_amount', 0))
+                    
+                    # Using UPSERT logic (INSERT ... ON CONFLICT) for PostgreSQL
+                    cur.execute("""
+                        INSERT INTO productinstore (store_id, product_id, quantity)
+                        VALUES (%s, %s, %s)
+                        ON CONFLICT (store_id, product_id)
+                        DO UPDATE SET quantity = productinstore.quantity + EXCLUDED.quantity
+                    """, (sid, pid, amt))
+                
+                conn.commit()
+                return response(200, {"status": "success", "message": "Inventory updated"})
+            except Exception as e:
+                conn.rollback()
+                return response(500, {"status": "error", "message": str(e)})
         else:
             return response(404, {"error": "Route not found"})
 
