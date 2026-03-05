@@ -77,7 +77,76 @@ export async function getProducts(filters = {}) {
  * @returns {Promise<Array>} Array of categories with nested subcategories
  */
 export async function getStores() {
-    return apiRequest('/stores');
+    try {
+        const endpoint = `/stores`;
+        const storeData = await apiRequest(endpoint)
+        const transformed = storeData.map(s => ({
+            key: s.id,
+            text: s.name,
+            value: s.id
+        }));
+        return transformed
+    } catch (err) {
+        console.error(err);
+        return [];
+    }
+}
+
+export async function getCategories() {
+    try {
+        const endpoint = `/categories`;
+        const categoryData = await apiRequest(endpoint)
+
+        // Transform hierarchical data to flat structure for the component
+        const transformedCategories = {
+            primary: [],
+            secondary: {},
+            tertiary: {}
+        };
+
+        categoryData.forEach(primaryCat => {
+            // Add primary category
+            transformedCategories.primary.push({
+                key: primaryCat.id,
+                text: primaryCat.name,
+                value: primaryCat.id
+            });
+
+            // Process secondary categories
+            if (primaryCat.subcategories) {
+                primaryCat.subcategories.forEach(secondaryCat => {
+                    // Add secondary category under primary
+                    if (!transformedCategories.secondary[primaryCat.id]) {
+                        transformedCategories.secondary[primaryCat.id] = [];
+                    }
+                    transformedCategories.secondary[primaryCat.id].push({
+                        key: secondaryCat.id,
+                        text: secondaryCat.name,
+                        value: secondaryCat.id
+                    });
+
+                    // Process tertiary categories
+                    if (secondaryCat.subcategories) {
+                        secondaryCat.subcategories.forEach(tertiaryCat => {
+                            // Add tertiary category under secondary
+                            if (!transformedCategories.tertiary[secondaryCat.id]) {
+                                transformedCategories.tertiary[secondaryCat.id] = [];
+                            }
+                            transformedCategories.tertiary[secondaryCat.id].push({
+                                key: tertiaryCat.id,
+                                text: tertiaryCat.name,
+                                value: tertiaryCat.id
+                            });
+                        });
+                    }
+                });
+            }
+        });
+        return transformedCategories;
+    } catch (err) {
+        console.error(err);
+        return { primary: [], secondary: {}, tertiary: {} };
+    }
 }
 
 export async function getUnofferedProducts(storeId) {
@@ -102,10 +171,16 @@ export async function unofferProducts(storeId, productIds) {
     });
 }
 
-
 export async function updateQuantity(storeId, update_items) {
     return apiRequest('/quantities', {
         method: 'PUT',
         body: JSON.stringify({ store_id: storeId, update_items }),
+    });
+}
+
+export async function subscribe(storeId, categoryId, frequency) {
+    return apiRequest('/subscribe', {
+        method: 'POST',
+        body: JSON.stringify({ store_id: storeId, category_id: categoryId, frequency }),
     });
 }

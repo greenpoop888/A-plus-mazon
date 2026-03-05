@@ -80,7 +80,7 @@ export async function getStores() {
  * @returns {Promise<Array>} Array of categories with nested subcategories
  */
 export async function getCategories() {
-    return apiRequest('/categories');
+    const apiRequest('/categories');
 }
 
 /**

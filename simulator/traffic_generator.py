@@ -48,7 +48,7 @@ def call_api(url, headers, json_data=None):
         print(f"Request failed: {e}")
         return None
 
-def generate_request(base_url, api_key):
+def generate_request(base_url, api_key, min_purchase = 1, max_purchase = 10):
     if not base_url: return
 
     headers = {
@@ -58,7 +58,7 @@ def generate_request(base_url, api_key):
 
     sid = random.randint(1, 2) 
     pid = random.randint(1, 9)
-    quantity = random.randint(1, 5)
+    quantity = random.randint(min_purchase, max_purchase)
 
     print(f"Deduct {quantity} of product_id = {pid} from store_id = {sid}")
     call_api(f"{base_url}/deduct", headers, json_data={"store_id": sid, "product_id": pid, "quantity": quantity})
@@ -66,7 +66,9 @@ def generate_request(base_url, api_key):
 
 if __name__ == "__main__":
     print("Starting traffic generator...")
-    input_rate = input("Enter requests per second (e.g., 10): ")
+    input_rate = int(input("Enter requests per second (e.g., 10): "))
+    min_purchase = int(input("Enter minimum purchase quantity (e.g., 1): "))
+    max_purchase = int(input("Enter maximum purchase quantity (e.g., 10): "))
 
     base_url, api_key = get_api_info()
     try:
@@ -78,7 +80,7 @@ if __name__ == "__main__":
             print(f"Target rate: {rate} req/s")
             
             while True:
-                generate_request(base_url, api_key)
+                generate_request(f"{base_url}", api_key, min_purchase, max_purchase)
                 time.sleep(interval)
                 
     except ValueError:

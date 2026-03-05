@@ -4,6 +4,8 @@ import Items from '../components/items';
 import Stories from '../components/store_selection';
 import OfferModal from '../components/offer_item';
 import { unofferProducts, updateQuantity } from '../services/api';
+import SubscribeModal from '../components/subscribe_model';
+import MySubscriptionsModal from '../components/my_subscriptions_modal';
 
 const Home = () => {
     const [store, setStore] = useState('');
@@ -17,6 +19,8 @@ const Home = () => {
     const [tempQuantities, setTempQuantities] = useState({});
     const [saveConfirmOpen, setSaveConfirmOpen] = useState(false);
     const [originalStocks, setOriginalStocks] = useState({});
+    const [isSubscribeOpen, setIsSubscribeOpen] = useState(false);
+    const [isMySubsOpen, setIsMySubsOpen] = useState(false);
 
     const handleSaveAllClick = () => {
         setSaveConfirmOpen(true);
@@ -115,13 +119,26 @@ const Home = () => {
                                 Unoffer ({selectedIds.length})
                             </Button>
                             {!isEditMode ? (
-                                <Button color='blue' onClick={() => setIsEditMode(true)}>Edit Quantity</Button>
+                                <>
+                                    <Button color='blue' onClick={() => setIsEditMode(true)}>Edit Quantity</Button>
+                                </>
                             ) : (
                                 <>
                                     <Button color='orange' onClick={handleSaveAllClick} icon='save' content='Save All Changes' />
                                     <Button onClick={() => setIsEditMode(false)}>Cancel</Button>
                                 </>
                             )}
+                            <Button
+                                color='teal'
+                                content='Subscribe Report'
+                                onClick={() => setIsSubscribeOpen(true)}
+                            />
+                            <Button
+                                color='violet'
+                                icon='list'
+                                content='My Reports'
+                                onClick={() => setIsMySubsOpen(true)}
+                            />
                         </Grid.Column>
                     </Grid.Row>
                 </Grid>
@@ -172,6 +189,17 @@ const Home = () => {
                 onConfirm={handleConfirmUnoffer}
                 cancelButton='No, keep them'
                 confirmButton='Yes, remove from store'
+            />
+
+            <SubscribeModal
+                isOpen={isSubscribeOpen}
+                onClose={() => setIsSubscribeOpen(false)}
+                currentStoreId={store}
+            />
+
+            <MySubscriptionsModal
+                isOpen={isMySubsOpen}
+                onClose={() => setIsMySubsOpen(false)}
             />
         </Container>
     );

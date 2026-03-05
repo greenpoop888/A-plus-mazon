@@ -2,7 +2,7 @@ import sys
 import os
 from dotenv import load_dotenv
 from sqlmodel import create_engine, SQLModel
-from ..models import Product, Category, Store, ProductLine, ProductInStore
+from ..models import Product, Category, Store, ProductLine, ProductInStore, Report, ReportSubscription, Transaction
 from ..config.config import settings
 
 engine = create_engine(settings.DATABASE_URL, echo=True) 

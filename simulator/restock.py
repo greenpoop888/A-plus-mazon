@@ -53,7 +53,7 @@ def call_api(method, url, headers, json_data=None):
         print(f"Request failed: {e}")
         return None
 
-def query_quantity(base_url, api_key):
+def query_quantity(base_url, api_key, min_stock = 10):
     if not base_url: return
 
     headers = {
@@ -62,7 +62,8 @@ def query_quantity(base_url, api_key):
     }
 
     print(f"Querying inventory...")
-    call_api("GET", f"{base_url}/inventory_need_restock", headers)
+    res = call_api("GET", f"{base_url}/inventory_need_restock?min_stock={min_stock}", headers)
+    return res
 
 def add_quantity(base_url, api_key, to_restock_inventory):
     if not base_url: return
@@ -79,15 +80,23 @@ def add_quantity(base_url, api_key, to_restock_inventory):
 
 if __name__ == "__main__":
     print("Starting restock generator...")
+    min_stock = int(input("Enter min stock to trigger restock: "))
 
     apigateway_url, api_key = get_api_info()
     interval = 1.0
     
     try:
         while True:
-            to_restock_inventory = query_quantity(f"{apigateway_url}", api_key)
-            if to_restock_inventory :
-                add_quantity(f"{apigateway_url}", api_key, to_restock_inventory)
+            response = query_quantity(f"{apigateway_url}", api_key, min_stock)
+            
+            if response and response.status_code == 200:
+                to_restock_inventory = response.json() 
+                
+                if to_restock_inventory:
+                    add_quantity(f"{apigateway_url}", api_key, to_restock_inventory)
+                else:
+                    print("Inventory is healthy, no restock needed.")
+            
             time.sleep(interval)
     except KeyboardInterrupt:
         print("\nStopped by user.")

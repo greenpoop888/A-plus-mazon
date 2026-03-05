@@ -11,17 +11,12 @@ const Stories = ({ store, onStoreChange, onStoresLoad }) => {
         const fetchStoresData = async () => {
             try {
                 const storeData = await getStores();
-                const transformed = storeData.map(s => ({
-                    key: s.id,
-                    text: s.name,
-                    value: s.id
-                }));
-                setStores(transformed);
+                setStores(storeData);
 
-                if (onStoresLoad) onStoresLoad(transformed);
+                if (onStoresLoad) onStoresLoad(storeData);
 
-                if (transformed.length > 0 && !store) {
-                    onStoreChange(transformed[0].value);
+                if (storeData.length > 0 && !store) {
+                    onStoreChange(storeData[0].value);
                 }
             } catch (err) {
                 console.error(err);
