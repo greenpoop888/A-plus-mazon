@@ -22,7 +22,7 @@ please refer to README.md under each folder to know more.
  **Please notice that this assignmenet was written under my personal AWS account, my Learner lab account was deactivated by AWS, and after comminucated with professor, he suggested me to develop using my personal AWS account, for your grading purpose, you might need to use personal AWS account since I will create a LabRole in my terraform to simulate lab environment.**
 
 * You need to generate key pair and access key manually to keep going on,
-1. generate key pair
+- generate key pair
   1. Go to Ec2 console
   2. Click on Key Pairs under Network & Security in left navigate menu
   3. Check your region is us-east-1 (important)
@@ -31,7 +31,7 @@ please refer to README.md under each folder to know more.
   6. Create key pair
   7. it should automatically download your pem file, please make sure to store it, my deploy script will ask for it's path
 
-2. generate access key
+- generate access key
   1. Go to IAM console
   2. Click on Users under Access Management in left navigate menu
   3. Click on Create user
