@@ -1,108 +1,208 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, List, Button, Icon, Header, Loader, Table, Pagination, Breadcrumb } from 'semantic-ui-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Modal, List, Button, Icon, Loader, Table, Pagination, Label, Message } from 'semantic-ui-react';
+import { get_subscription, toggle_subscription_status, unsubscribe, get_reports } from '../services/api';
 
 const MySubscriptionsModal = ({ isOpen, onClose }) => {
     const [view, setView] = useState('list'); // 'list' or 'files'
     const [selectedSub, setSelectedSub] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [subscriptions, setSubscriptions] = useState([]);
+    const [error, setError] = useState(null);
 
-    // 模擬數據：訂閱項目
-    const subscriptions = [
-        { id: 101, title: 'Store 1 (By Minute)', type: 'store', target: 'Store 1', freq: 'minute' },
-        { id: 102, title: 'Electronics (By Day)', type: 'category', target: 'Laptops', freq: 'day' },
-    ];
-
-    // 模擬數據：S3 檔案列表 (含分頁)
-    const [files, setFiles] = useState([]);
+    const [reports, setReports] = useState([]);
     const [activePage, setActivePage] = useState(1);
-    const totalPages = 5;
+    const [totalPages, setTotalPages] = useState(1);
+    const PAGE_SIZE = 8;
+
+    const refreshList = useCallback(async () => {
+        setLoading(true);
+        try {
+            const data = await get_subscription();
+            setSubscriptions(data);
+            setError(null);
+        } catch (err) {
+            setError("Unable to load subscription list. Please try again later.");
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    const fetchReports = useCallback(async (taskId, page) => {
+        setLoading(true);
+        try {
+            const data = await get_reports(taskId, page, PAGE_SIZE);
+            setReports(data.items);
+            setTotalPages(data.total_pages);
+            setActivePage(data.page);
+        } catch (err) {
+            setError("Unable to load reports. Please try again later.");
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (isOpen) {
+            refreshList();
+            setView('list');
+        }
+    }, [isOpen, refreshList]);
+
+    useEffect(() => {
+        if (view === 'files' && selectedSub) {
+            fetchReports(selectedSub.report_task_id, activePage);
+        }
+    }, [activePage, view, selectedSub, fetchReports]);
 
     const handleSubClick = (sub) => {
         setSelectedSub(sub);
-        setLoading(true);
-        // 這裡應該呼叫 API 獲取該訂閱下的 S3 檔案列表
-        setTimeout(() => {
-            setFiles([
-                { id: 1, name: 'report_2026_03_04_1200.pdf', url: 'https://s3.amazon...' },
-                { id: 2, name: 'report_2026_03_04_1201.pdf', url: 'https://s3.amazon...' },
-            ]);
-            setLoading(false);
-            setView('files');
-        }, 500);
+        setActivePage(1);
+        setView('files');
     };
 
     const handleBack = () => {
         setView('list');
         setSelectedSub(null);
+        setReports([]);
+    };
+
+    const handleTogglePause = async (sub) => {
+        try {
+            const newStatus = !sub.is_active;
+            await toggle_subscription_status(sub.report_task_id, newStatus);
+            refreshList();
+        } catch (err) {
+            alert("Status update failed");
+        }
+    };
+
+    const handleUnsubscribe = async (sub) => {
+        if (window.confirm(`Are you sure you want to unsubscribe from ${sub.target_name}? This will stop generating new reports.`)) {
+            try {
+                await unsubscribe(sub.report_task_id);
+                refreshList();
+            } catch (err) {
+                alert("Unsubscription failed");
+            }
+        }
     };
 
     return (
-        <Modal open={isOpen} onClose={onClose} size='small'>
+        <Modal open={isOpen} onClose={onClose} size='small' closeIcon>
             <Modal.Header>
                 {view === 'files' && (
-                    <Button icon='arrow left' basic size='mini' onClick={handleBack} style={{ marginRight: '1em' }} />
+                    <Button icon='arrow left' basic circular onClick={handleBack} style={{ marginRight: '1em' }} />
                 )}
-                {view === 'list' ? 'My Report Subscriptions' : `Reports for ${selectedSub?.title}`}
+                <Icon name='newspaper outline' />
+                {view === 'list' ? 'My Reports' : `Report List: ${selectedSub?.target_name}`}
             </Modal.Header>
 
-            <Modal.Content scrolling>
-                {loading ? (
-                    <Loader active inline='centered'>Fetching Reports...</Loader>
+            <Modal.Content scrolling style={{ minHeight: '300px' }}>
+                {error && <Message error content={error} />}
+
+                {loading && view === 'list' ? (
+                    <Loader active inline='centered'>Loading...</Loader>
                 ) : view === 'list' ? (
-                    /* 視圖 1：訂閱項目清單 */
                     <List selection divided relaxed='very'>
+                        {subscriptions.length === 0 && !loading && <Message info content="Currently no reports subscribed." />}
                         {subscriptions.map(sub => (
-                            <List.Item key={sub.id} onClick={() => handleSubClick(sub)}>
-                                <Icon name='file alternate outline' color='blue' />
-                                <List.Content>
-                                    <List.Header>{sub.title}</List.Header>
-                                    <List.Description>Target: {sub.target} | Frequency: {sub.freq}</List.Description>
-                                </List.Content>
+                            <List.Item key={sub.report_task_id} onClick={() => handleSubClick(sub)}>
                                 <List.Content floated='right'>
-                                    <Icon name='chevron right' />
+                                    <Button.Group size='mini'>
+                                        <Button
+                                            icon
+                                            basic
+                                            color={sub.is_active ? 'orange' : 'green'}
+                                            onClick={(e) => { e.stopPropagation(); handleTogglePause(sub); }}
+                                            title={sub.is_active ? 'Pause' : 'Resume'}
+                                        >
+                                            <Icon name={sub.is_active ? 'pause' : 'play'} />
+                                        </Button>
+                                        <Button
+                                            icon
+                                            basic
+                                            color='red'
+                                            onClick={(e) => { e.stopPropagation(); handleUnsubscribe(sub); }}
+                                            title="Unsubscribe"
+                                        >
+                                            <Icon name='trash alternate' />
+                                        </Button>
+                                    </Button.Group>
+                                </List.Content>
+
+                                <List.Content>
+                                    <List.Header>
+                                        {sub.target_name}
+                                        {sub.is_active ?
+                                            <Label size='mini' color='green' circular empty style={{ marginLeft: '8px' }} /> :
+                                            <Label size='mini' color='grey' style={{ marginLeft: '8px' }}>Paused</Label>
+                                        }
+                                    </List.Header>
+                                    <List.Description>
+                                        <Icon name='clock outline' /> Frequency: {sub.task_detail.frequency} |
+                                        Type: <strong>{sub.task_detail.target_type.toUpperCase()}</strong>
+                                    </List.Description>
                                 </List.Content>
                             </List.Item>
                         ))}
                     </List>
                 ) : (
-                    /* 視圖 2：檔案列表 (表格 + 分頁) */
                     <>
-                        <Table basic='very' selectable>
+                        <Table basic='very' selectable compact>
                             <Table.Header>
                                 <Table.Row>
-                                    <Table.HeaderCell>Report Name</Table.HeaderCell>
-                                    <Table.HeaderCell textAlign='right'>Action</Table.HeaderCell>
+                                    <Table.HeaderCell>Filename</Table.HeaderCell>
+                                    <Table.HeaderCell textAlign='right'>Download</Table.HeaderCell>
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
-                                {files.map(file => (
-                                    <Table.Row key={file.id}>
-                                        <Table.Cell>
-                                            <Icon name='file pdf outline' color='red' /> {file.name}
-                                        </Table.Cell>
-                                        <Table.Cell textAlign='right'>
-                                            <a href={file.url} target="_blank" rel="noreferrer">
-                                                <Button size='mini' color='blue' icon='download' content='Download' />
-                                            </a>
-                                        </Table.Cell>
-                                    </Table.Row>
-                                ))}
+                                {loading ? (
+                                    <Table.Row><Table.Cell colSpan='2' textAlign='center'><Loader active inline /></Table.Cell></Table.Row>
+                                ) : reports.length === 0 ? (
+                                    <Table.Row><Table.Cell colSpan='2' textAlign='center'>No report available at the moment.</Table.Cell></Table.Row>
+                                ) : (
+                                    reports.map(file => (
+                                        <Table.Row key={file.id}>
+                                            <Table.Cell>
+                                                <Icon name='file excel outline' color='green' />
+                                                {file.s3_key.split('/').pop()}
+                                            </Table.Cell>
+                                            <Table.Cell textAlign='right'>
+                                                <a
+                                                    href={file.download_url}
+                                                    download={`${file.s3_key.split('/').pop()}`}
+                                                    rel="noreferrer"
+                                                >
+                                                    <Button
+                                                        size='mini'
+                                                        circular
+                                                        icon='download'
+                                                        color='blue'
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    />
+                                                </a>
+                                            </Table.Cell>
+                                        </Table.Row>
+                                    ))
+                                )}
                             </Table.Body>
                         </Table>
 
-                        <div style={{ textAlign: 'center', marginTop: '1em' }}>
-                            <Pagination
-                                activePage={activePage}
-                                onPageChange={(e, { activePage }) => setActivePage(activePage)}
-                                totalPages={totalPages}
-                                secondary
-                            />
-                        </div>
+                        {totalPages > 1 && (
+                            <div style={{ textAlign: 'center', marginTop: '1.5em' }}>
+                                <Pagination
+                                    activePage={activePage}
+                                    onPageChange={(e, { activePage }) => setActivePage(activePage)}
+                                    totalPages={totalPages}
+                                    size='mini'
+                                />
+                            </div>
+                        )}
                     </>
                 )}
             </Modal.Content>
             <Modal.Actions>
-                <Button onClick={onClose}>Close</Button>
+                <Button onClick={onClose} basic>Close</Button>
             </Modal.Actions>
         </Modal>
     );

@@ -179,8 +179,39 @@ export async function updateQuantity(storeId, update_items) {
 }
 
 export async function subscribe(storeId, categoryId, frequency) {
+    var target_type = storeId ? 'store' : 'category';
+    var target_id = storeId || categoryId;
     return apiRequest('/subscribe', {
         method: 'POST',
-        body: JSON.stringify({ store_id: storeId, category_id: categoryId, frequency }),
+        body: JSON.stringify({ target_type, target_id, frequency }),
+    });
+}
+
+export async function get_subscription() {
+    return apiRequest('/subscriptions', {
+        method: 'GET',
+    });
+}
+
+export async function get_reports(taskId, page, PAGE_SIZE) {
+    const params = new URLSearchParams();
+    params.append('page', page);
+    params.append('page_size', PAGE_SIZE);
+
+    return apiRequest(`/report/${taskId}/files?${params.toString()}`, {
+        method: 'GET',
+    });
+}
+
+export async function toggle_subscription_status(taskId, status) {
+    return apiRequest(`/subscriptions/${taskId}/toggle`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+    });
+}
+
+export async function unsubscribe(taskId) {
+    return apiRequest(`/subscriptions/${taskId}`, {
+        method: 'DELETE',
     });
 }

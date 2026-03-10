@@ -2,6 +2,7 @@ resource "aws_instance" "client_server" {
   ami           = data.aws_ami.amazon_linux.id
   instance_type = var.ec2_instance_type
   key_name      = var.ec2_key_name
+  iam_instance_profile = aws_iam_instance_profile.lab_instance_profile.name
 
   vpc_security_group_ids = [
     aws_security_group.app_sg.id
@@ -21,7 +22,8 @@ resource "aws_instance" "client_server" {
 resource "aws_instance" "management_server" {
   ami           = data.aws_ami.amazon_linux.id
   instance_type = var.ec2_instance_type
-  key_name      = var.ec2_key_name
+  key_name      = var.ec2_key_name 
+  iam_instance_profile = aws_iam_instance_profile.lab_instance_profile.name
 
   vpc_security_group_ids = [
     aws_security_group.app_sg.id

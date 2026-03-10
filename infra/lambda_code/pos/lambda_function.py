@@ -99,11 +99,11 @@ def lambda_handler(event, context):
                 final_price = float(p_info['price']) * float(p_info['rate'])
                 revenue = round(final_price * qty, 2)
                 
-                conn.run("""INSERT INTO transaction (store_id, product_barcode, product_name, 
+                conn.run("""INSERT INTO transaction (store_id, product_id,product_barcode, product_name, 
                                                    primary_category_id, secondary_category_id, tertiary_category_id, 
                                                    quantity, revenue, timestamp)
-                            VALUES (:sid, :bc, :name, :p1, :p2, :p3, :q, :rev, NOW())""", 
-                         sid=sid, bc=p_info['bc'], name=p_info['name'], 
+                            VALUES (:sid, :pid, :bc, :name, :p1, :p2, :p3, :q, :rev, NOW())""", 
+                         sid=sid, pid=pid, bc=p_info['bc'], name=p_info['name'], 
                          p1=p_info['p1'], p2=p_info['p2'], p3=p_info['p3'], 
                          q=qty, rev=revenue)
 
@@ -145,11 +145,11 @@ def lambda_handler(event, context):
                     final_price = float(p_info['price']) * float(p_info['rate'])
                     revenue = round(final_price * qty, 2)
                     
-                    conn.run("""INSERT INTO transaction (store_id, product_barcode, product_name, 
+                    conn.run("""INSERT INTO transaction (store_id, product_id, product_barcode, product_name, 
                                                        primary_category_id, secondary_category_id, tertiary_category_id, 
                                                        quantity, revenue, timestamp)
-                                VALUES (:sid, :bc, :name, :p1, :p2, :p3, :q, :rev, NOW())""", 
-                             sid=sid, bc=p_info['bc'], name=p_info['name'], 
+                                VALUES (:sid, :pid, :bc, :name, :p1, :p2, :p3, :q, :rev, NOW())""", 
+                             sid=sid, pid=pid, bc=p_info['bc'], name=p_info['name'], 
                              p1=p_info['p1'], p2=p_info['p2'], p3=p_info['p3'], 
                              q=qty, rev=revenue)
                              

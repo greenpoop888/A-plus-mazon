@@ -13,21 +13,12 @@ output "client_ec2_public_dns" {
   value       = aws_instance.client_server.public_dns
 }
 
-output "s3_bucket_name" {
+output "s3_images_bucket_name" {
   description = "Name of the S3 bucket for build artifacts"
   value       = aws_s3_bucket.app_bucket.id
 }
 
-output "s3_bucket_arn" {
-  description = "ARN of the S3 bucket"
-  value       = aws_s3_bucket.app_bucket.arn
-}
-
-output "s3_bucket_id" {
-  value = aws_s3_bucket.app_bucket.id
-}
-
-output "s3_bucket_domain_name" {
+output "s3_images_bucket_domain_name" {
   value = "https://${aws_s3_bucket.app_bucket.bucket_regional_domain_name}"
 }
 
@@ -60,4 +51,16 @@ output "user_pool_client_id" {
 
 output "aws_region" {
   value = var.aws_region
+}
+
+output "lambda_function_name" {
+  value = aws_lambda_function.inventory_api.function_name
+}
+
+output "s3_reports_bucket_name" {
+  value = aws_s3_bucket.reports.id
+}
+
+output "s3_reports_bucket_domain_name" {
+  value = "https://${aws_s3_bucket.reports.bucket_regional_domain_name}"
 }

@@ -4,5 +4,7 @@ from .product_in_store import ProductInStore
 from .product_line import ProductLine
 from .store import Store
 from .report import Report
-from .report_schedule import ReportSubscription
+from .report_task import ReportTask
+from .subscription import Subscription
 from .transaction import Transaction
+from .subscription_duration import SubscriptionDuration

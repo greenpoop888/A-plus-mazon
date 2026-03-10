@@ -1,51 +1,100 @@
-from typing import Optional
-from sqlmodel import Session, select
-from ..models import ReportSubscription
+from typing import List, Dict, Any
+from sqlmodel import Session, select, col
+from ..models import Subscription, ReportTask, Store, Category
 
 class SubscriptionDAO:
     def __init__(self, session: Session):
         self.session = session
 
-    def subscribe(
-        self, 
-        user_id: str, 
-        store_id: Optional[int] = None, 
-        category_id: Optional[int] = None, 
-        frequency: str = "day"
-    ) -> bool:
+    def subscribe(self, user_id: str, report_task_id: int) -> bool:
         try:
-            if store_id is not None:
-                t_type = "store"
-                t_id = store_id
-            elif category_id is not None:
-                t_type = "category"
-                t_id = category_id
-            else:
-                print("Error: Either store_id or category_id must be provided.")
-                return False
-
-            new_sub = ReportSubscription(
-                user_cognito_id=user_id,
-                target_type=t_type,
-                target_id=t_id,
-                frequency=frequency
+            statement = select(Subscription).where(
+                Subscription.user_cognito_id == user_id,
+                Subscription.report_task_id == report_task_id
             )
+            sub = self.session.exec(statement).first()
 
-            self.session.add(new_sub)
+            if sub:
+                sub.is_active = True
+                self.session.add(sub)
+            else:
+                sub = Subscription(user_cognito_id=user_id, report_task_id=report_task_id)
+                self.session.add(sub)
+            
             self.session.commit()
-            self.session.refresh(new_sub)
             return True
+        except Exception as e:
+            print(f"Error subscribing: {e}")
+            self.session.rollback()
+            raise e
+
+    def get_user_subscriptions(self, user_id: str) -> List[Dict[str, Any]]:
+        formatted_results = []
+        try:
+            store_stmt = (
+                select(Subscription, ReportTask, Store.name)
+                .join(ReportTask, Subscription.report_task_id == ReportTask.id)
+                .join(Store, ReportTask.target_id == Store.id)
+                .where(Subscription.user_cognito_id == user_id)
+                .where(ReportTask.target_type == "store")
+            )
+            store_res = self.session.exec(store_stmt).all()
+            for sub, task, name in store_res:
+                formatted_results.append({
+                    **sub.model_dump(),
+                    "target_name": name,
+                    "task_detail": task.model_dump()
+                })
+
+            cat_stmt = (
+                select(Subscription, ReportTask, Category.name)
+                .join(ReportTask, Subscription.report_task_id == ReportTask.id)
+                .join(Category, ReportTask.target_id == Category.id)
+                .where(Subscription.user_cognito_id == user_id)
+                .where(ReportTask.target_type == "category")
+            )
+            cat_res = self.session.exec(cat_stmt).all()
+            for sub, task, name in cat_res:
+                formatted_results.append({
+                    **sub.model_dump(),
+                    "target_name": name,
+                    "task_detail": task.model_dump()
+                })
+
+            formatted_results.sort(key=lambda x: x.get('active_time'), reverse=True)
+            
+            return formatted_results
 
         except Exception as e:
-            print(f"Error creating subscription: {e}")
-            self.session.rollback()
-            return False
-        
-    def get_subscriptions(self, user_id: str):
-        try:
-            statement = select(ReportSubscription).where(ReportSubscription.user_cognito_id == user_id)
-            results = self.session.exec(statement).all()
-            return results
-        except Exception as e:
-            print(f"Error retrieving subscriptions: {e}")
+            print(f"Error fetching subscriptions: {e}")
             return []
+
+    # 5. Unsubscribe (Physical Remove)
+    def unsubscribe(self, user_id: str, report_task_id: int) -> bool:
+        statement = select(Subscription).where(
+            Subscription.user_cognito_id == user_id,
+            Subscription.report_task_id == report_task_id
+        )
+        sub = self.session.exec(statement).first()
+        if sub:
+            self.session.delete(sub)
+            self.session.commit()
+            return True
+        return False
+
+    # 6. Pause/Toggle Subscription (Logical Update)
+    def toggle_subscription_status(self, user_id: str, report_task_id: int, status: bool) -> bool:
+        statement = select(Subscription).where(
+            Subscription.user_cognito_id == user_id,
+            Subscription.report_task_id == report_task_id
+        )
+        sub = self.session.exec(statement).first()
+        if sub:
+            sub.is_active = status
+            self.session.add(sub)
+            self.session.commit()
+            return True
+        return False
+    
+
+    

@@ -66,9 +66,35 @@ def generate_request(base_url, api_key, min_purchase = 1, max_purchase = 10):
 
 if __name__ == "__main__":
     print("Starting traffic generator...")
-    input_rate = int(input("Enter requests per second (e.g., 10): "))
-    min_purchase = int(input("Enter minimum purchase quantity (e.g., 1): "))
-    max_purchase = int(input("Enter maximum purchase quantity (e.g., 10): "))
+    while True:
+        try:
+            input_rate = int(input("How many requests per second? (e.g., 1): "))
+            if input_rate < 1:
+                print("Error: Minimum input rate must be at least 1.")
+                continue
+            break
+        except ValueError:
+            print("Error: Please enter a valid number.")
+    
+    while True:
+        try:
+            min_purchase = int(input("Enter minimum purchase quantity (e.g., 1): "))
+            if min_purchase < 1:
+                print("Error: Minimum purchase must be at least 1.")
+                continue
+            break
+        except ValueError:
+            print("Error: Please enter a valid number.")
+
+    while True:
+        try:
+            max_purchase = int(input("Enter maximum purchase quantity (e.g., 10): "))
+            if max_purchase < min_purchase:
+                print(f"Error: Maximum purchase cannot be less than minimum ({min_purchase}).")
+                continue
+            break
+        except ValueError:
+            print("Error: Please enter a valid number.")
 
     base_url, api_key = get_api_info()
     try:
